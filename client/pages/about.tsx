@@ -10,8 +10,6 @@ export const About = () => {
                 .then((res) => res.data).catch(() => null),
     });
 
-    console.log({ data, isLoading });
-
     if (isLoading) return <div>Loading...</div>;
 
     return (

@@ -29,6 +29,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
       hono:
         specifier: ^4.7.9
         version: 4.7.9
@@ -72,6 +75,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.1.7
         version: 4.1.7
+      '@types/dotenv-webpack':
+        specifier: ^7.0.8
+        version: 7.0.8
       '@types/node':
         specifier: ^22.15.17
         version: 22.15.17
@@ -638,6 +644,9 @@ packages:
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
 
+  '@types/dotenv-webpack@7.0.8':
+    resolution: {integrity: sha512-JiLJdF2y9dW0eJjKUBlVnIwz/Raej00MOMdKcUuVxYJquvcuMgQdJw7cnN+hRZ7eejYgKr8kZsIw4nihwYYGeA==}
+
   '@types/eslint-scope@3.7.7':
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
 
@@ -1126,6 +1135,10 @@ packages:
     engines: {node: '>=10'}
     peerDependencies:
       webpack: ^4 || ^5
+
+  dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
+    engines: {node: '>=12'}
 
   dotenv@8.6.0:
     resolution: {integrity: sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==}
@@ -2986,6 +2999,17 @@ snapshots:
     dependencies:
       '@types/node': 22.15.17
 
+  '@types/dotenv-webpack@7.0.8':
+    dependencies:
+      '@types/node': 22.15.17
+      tapable: 2.2.1
+      webpack: 5.99.8
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
+      - webpack-cli
+
   '@types/eslint-scope@3.7.7':
     dependencies:
       '@types/eslint': 9.6.1
@@ -3495,6 +3519,8 @@ snapshots:
     dependencies:
       dotenv-defaults: 2.0.2
       webpack: 5.99.8
+
+  dotenv@16.5.0: {}
 
   dotenv@8.6.0: {}
 

@@ -4,7 +4,6 @@ import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
 import { RunScriptWebpackPlugin } from "run-script-webpack-plugin";
 import WebpackObfuscator from "webpack-obfuscator";
 import path from "path";
-import Dotenv from "dotenv-webpack";
 
 // Target browsers, see: https://github.com/browserslist/browserslist
 const targets = ["last 2 versions", "> 0.2%", "not dead", "Firefox ESR"];
@@ -63,8 +62,8 @@ const clientConfig = (mode: "development" | "production") =>
                   transform: {
                     react: {
                       runtime: "automatic",
-                      development: mode === "development",
-                      refresh: mode === "development",
+                      development: false,
+                      refresh: false,
                     },
                   },
                 },
@@ -76,14 +75,6 @@ const clientConfig = (mode: "development" | "production") =>
       ],
     },
     plugins: [
-      new Dotenv({
-        path: path.resolve(
-          import.meta.dirname,
-          "environments",
-          `.env.client.${mode}`
-        ),
-        safe: true,
-      }),
       mode !== "development"
         ? new WebpackObfuscator({
             compact: true,
@@ -186,7 +177,7 @@ const serverConfig = (mode: "development" | "production") =>
                   transform: {
                     react: {
                       runtime: "automatic",
-                      development: mode === "development",
+                      development: false,
                     },
                   },
                 },
@@ -208,14 +199,6 @@ const serverConfig = (mode: "development" | "production") =>
       css: true,
     },
     plugins: [
-      new Dotenv({
-        path: path.resolve(
-          import.meta.dirname,
-          "environments",
-          `.env.server.${mode}`
-        ),
-        safe: true,
-      }),
       mode === "development" &&
         new RunScriptWebpackPlugin({
           name: "server.js",
@@ -224,8 +207,6 @@ const serverConfig = (mode: "development" | "production") =>
     ].filter(Boolean),
   });
 
-export default function (env: any, argv: any) {
-  console.log({ mode: argv.mode });
-
+export default function (_: any, argv: any) {
   return [clientConfig(argv.mode), serverConfig(argv.mode)];
 }
