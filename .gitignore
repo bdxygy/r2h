@@ -11,3 +11,10 @@ _module
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+
+# Environments
+.env.client.development
+.env.client.production
+.env.server.development
+.env.server.production

@@ -6,7 +6,7 @@ export const Home = () => {
         id: "home",
         handler: () =>
             axios
-                .get("https://jsonplaceholder.typicode.com/todos/1")
+                .get(origin + "/api")
                 .then((res) => res.data).catch(() => null),
     });
 
@@ -15,7 +15,7 @@ export const Home = () => {
     return (
         <div>
             <h1>Home</h1>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+            <h2>{data}</h2>
         </div>
     );
 };
