@@ -6,13 +6,10 @@ import { StaticRouter } from "react-router";
 import { PassThrough } from "stream";
 import { compress } from "hono/compress";
 import { getDataMapFromPipeStream, streamToResponse } from "$shared/stream";
-import {
-    ServerContextI,
-    ServerQueryProvider,
-} from "$shared/stores/server-context";
+import { ServerContextI, ServerQueryProvider } from "$shared/server-context";
 import { lazy } from "react";
 
-const Root = lazy(() => import("$client/Root"));
+const Root = lazy(() => import("$client/root"));
 
 const app = new Hono({
     strict: false,
@@ -27,6 +24,9 @@ app.use(
 app.use("/public/*", serveStatic({ root: "./_module" }));
 
 app.route("/api", api);
+
+app.get("/.well-known/appspecific/com.chrome.devtools.json", (c) => c.body(null, 204));
+app.get("/favicon.ico", (c) => c.body(null, 204));
 
 app.get("/*", async (c) => {
     let didError = false;

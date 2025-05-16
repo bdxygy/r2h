@@ -1,8 +1,9 @@
-import "./Root.css";
 import { lazy } from "react";
-import Logo from "./assets/react.svg";
 
-const App = lazy(() => import("./App"));
+import Logo from "./assets/react.svg";
+import "./Root.css";
+
+const App = lazy(() => import("./app"));
 
 
 function Root() {
@@ -17,7 +18,7 @@ function Root() {
             </head>
             <body>
                 <div id="root">
-                    <App/>
+                    <App />
                 </div>
             </body>
         </html>

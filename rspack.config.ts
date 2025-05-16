@@ -13,6 +13,7 @@ const baseOutputPath = path.resolve(import.meta.dirname, "_module");
 
 const clientConfig = (mode: "development" | "production") => defineConfig({
 	name: "client",
+	mode,
 	entry: {
 		main: "./client/main.tsx",
 	},
@@ -39,6 +40,11 @@ const clientConfig = (mode: "development" | "production") => defineConfig({
 	},
 	module: {
 		rules: [
+			{
+				test: /\.css$/,
+				use: ["postcss-loader"],
+				type: "css",
+			},
 			{
 				test: /\.svg$/,
 				type: "asset",
@@ -116,6 +122,7 @@ const clientConfig = (mode: "development" | "production") => defineConfig({
 
 const serverConfig = (mode: "development" | "production") => defineConfig({
 	name: "server",
+	mode,
 	entry: "./server/index.ts",
 	target: "node",
 	output: {
@@ -145,6 +152,11 @@ const serverConfig = (mode: "development" | "production") => defineConfig({
 	},
 	module: {
 		rules: [
+			{
+				test: /\.css$/,
+				use: ["postcss-loader"],
+				type: "css",
+			},
 			{
 				test: /\.svg$/,
 				type: "asset",
