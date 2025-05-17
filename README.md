@@ -1,7 +1,5 @@
 # ⚛️ React + Rspack + Hono SSR Boilerplate
 
-[![GitHub Stars](https://github.com/bdxygy/react-hono?style=social)](https://github.com/bdxygy/react-hono/stargazers)
-[![GitHub License](https://github.com/bdxygy/react-hono)](https://github.com/bdxygy/react-hono/blob/main/LICENSE)
 ![Node Version](https://img.shields.io/badge/node-22%2B-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
 ![Rspack](https://img.shields.io/badge/Bundler-Rspack-red)
