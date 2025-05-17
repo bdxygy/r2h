@@ -1,11 +1,31 @@
-# ⚛️ React + Rspack + Hono SSR Boilerplate
+# ⚛️ R2H Boilerplate
 
 ![Node Version](https://img.shields.io/badge/node-22%2B-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
 ![Rspack](https://img.shields.io/badge/Bundler-Rspack-red)
 ![React 19](https://img.shields.io/badge/React-19.1.0-61dafb)
 
-> A blazing-fast SSR starter powered by **Rspack**, **React 19**, and **Hono** — engineered for modern development with cutting-edge performance, beautiful UI components, and secure production builds.
+> A blazing-fast SSR starter powered by **React 19**, **Rspack**, and **Hono** — engineered for modern development with cutting-edge performance, beautiful UI components, and secure production builds.
+
+---
+
+## 💡 Motivation
+
+I built this boilerplate out of a growing need to break free from the limitations imposed by popular frameworks like Next.js and Remix.
+
+While those frameworks offer great DX, their performance often relies heavily on specific deployment architectures (like Vercel for Next.js). This can result in unnecessary complexity, vendor lock-in, and suboptimal flexibility for developers who want full control over their stack.
+
+This boilerplate is my answer to that problem — a lean, fast, and unopinionated SSR setup using:
+
+✅ React with full flexibility,
+
+✅ Rspack for blazing fast builds,
+
+✅ Hono for a lightweight and modern web server,
+
+✅ Manual control over server-side data fetching, hydration, and routing.
+
+No limits. No lock-in. Just raw power and freedom.
 
 ---
 
@@ -22,7 +42,8 @@
 | **JavaScript Obfuscator**   | Protect source code in production builds                          |
 | **dotenv**                  | Manage environment variables                                      |
 | **TypeScript (strict)**     | Type-safe code for frontend and backend                           |
-| **Better-auth (Upcomming)** | Simple extensibility for OAuth, magic links, or custom strategies |
+| **Better-auth (upcoming)**  | Simple extensibility for OAuth, magic links, or custom strategies |
+| **Prisma ORM (upcoming)**   | Type-safe database access with powerful query capabilities        |
 
 ---
 
