@@ -120,7 +120,7 @@ Ideal for:
 
 ## 🪪 License
 
-MIT © [Your Name or Company]
+MIT © Budi Santoso (@bdxygy)
 
 ---
 
