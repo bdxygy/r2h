@@ -1,17 +1,19 @@
-import { useServerQuery } from "$shared/server-context";
 import axios from "axios";
 
+import { useServerQuery } from "$shared/server-context";
+
 export const Home = () => {
-  const { data, isLoading } = useServerQuery({
+  const { data, isLoading, error } = useServerQuery({
     id: "home",
     handler: () =>
       axios
         .get("http://localhost:32300/api")
-        .then((res) => res.data)
-        .catch(() => null),
+        .then((res) => res.data),
   });
 
   if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return (
     <div>

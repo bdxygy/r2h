@@ -1,157 +1,137 @@
-# REACT HONO
+# ⚛️ React + Rspack + Hono SSR Boilerplate
 
-A high-performance, modular React application with **Server-Side Rendering (SSR)** using **Rspack** and **Hono**, styled with **shadcn/ui** and built with a strong focus on speed, type safety, and maintainability.
+[![GitHub Stars](https://github.com/bdxygy/react-hono?style=social)](https://github.com/bdxygy/react-hono/stargazers)
+[![GitHub License](https://github.com/bdxygy/react-hono)](https://github.com/bdxygy/react-hono/blob/main/LICENSE)
+![Node Version](https://img.shields.io/badge/node-22%2B-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
+![Rspack](https://img.shields.io/badge/Bundler-Rspack-red)
+![React 19](https://img.shields.io/badge/React-19.1.0-61dafb)
 
-## 🔧 Tech Stack
-
-* **React 18** – Modern UI library
-* **Rspack** – Fast Rust-based bundler
-* **Hono** – Lightweight web framework for backend/server routes
-* **shadcn/ui** – Accessible, beautifully styled component library powered by Radix UI and Tailwind CSS
-* **TypeScript** – Type safety with strict mode
-* **PNPM** – Efficient package manager
+> A blazing-fast SSR starter powered by **Rspack**, **React 19**, and **Hono** — engineered for modern development with cutting-edge performance, beautiful UI components, and secure production builds.
 
 ---
 
-## 📁 Folder Structure
+## 🚀 Tech Stack
+
+| Tool                        | Purpose                                                           |
+|-----------------------------|-------------------------------------------------------------------|
+| **React 19**                | UI Library (Concurrent Features Ready)                            |
+| **Rspack**                  | Ultra-fast Rust-based bundler                                     |
+| **Hono**                    | Lightning-fast web framework for Node                             |
+| **React Router**            | Seamless routing with SSR compatibility                           |
+| **shadcn/ui + Radix UI**    | Accessible, customizable UI components                            |
+| **TailwindCSS 4**           | Utility-first styling with animation                              |
+| **JavaScript Obfuscator**   | Protect source code in production builds                          |
+| **dotenv**                  | Manage environment variables                                      |
+| **TypeScript (strict)**     | Type-safe code for frontend and backend                           |
+| **Better-auth (Upcomming)** | Simple extensibility for OAuth, magic links, or custom strategies |
+
+---
+
+## 🌐 Features
+
+- ✅ **Server-Side Rendering (SSR)** with `hono` and `react-dom/server`
+- ⚡ **Rspack HMR & Build Speed** like Vite but for complex apps
+- 🧠 **Custom `useServerQuery` Hook** for pre-hydration data fetching
+- 🔄 **React Router v7 SSR-Ready Routing**
+- 💅 **shadcn Components + Tailwind Merge + AnimateCSS**
+- 🛡️ **Obfuscated JavaScript** in production using `webpack-obfuscator`
+- 🧪 **Full TypeScript Support** with strict mode enabled
+
+---
+
+## 🔐 Authentication Made Easy
+
+With **better-auth**, this boilerplate supports:
+- JWT-based sessions
+- Authenticated route protection
+- Secure cookie/token management
+- Simple extensibility for OAuth, magic links, or custom strategies
+
+---
+
+## 📁 Project Structure
 
 ```
+
 .
-├── client/                  # Frontend (React) code
-│   ├── assets/             # Static assets (images, fonts, etc.)
-│   ├── pages/              # React pages or routed components
-│   ├── App.tsx            # Main App component
-│   ├── bootstrap.tsx      # Entry point for client hydration
-│   ├── Root.tsx           # Root-level layout/routing
-│   └── styles (css)       # Global CSS and Tailwind setup
-│
-├── server/                 # Server-side logic using Hono
-│   ├── api.ts             # API route definitions
-│   ├── hono.tsx           # Hono server configuration
-│   └── index.ts           # Server entry point
-│
-├── shared/                # Shared logic between client & server
-│   └── stores/            # State/context management
-│       ├── server-context.tsx
-│       └── stream.ts
-│
-├── .gitignore             # Git ignored files
-├── package.json           # Project metadata and scripts
-├── pnpm-lock.yaml         # Lockfile for reproducible installs
-├── README.md              # You are here 📘
-├── rspack.config.ts       # Rspack bundler config
-└── tsconfig.json          # TypeScript configuration
+├── client/             # React entry and routes
+├── server/             # Hono server logic (SSR handler)
+├── shared/             # Common hooks and contexts (e.g., useServerQuery)
+├── \_module/            # Output for built SSR server (server.js)
+├── public/             # Static assets
+└── rspack.config.ts    # Rspack build and plugin setup
+
 ```
 
 ---
 
-## 🧠 Features
+## 🧠 Intelligent Data Hydration
 
-* ⚡ Blazing-fast bundling and dev server via **Rspack**
-* 🧩 Universal rendering with **Hono** SSR
-* 💅 Elegant, accessible UI components via **shadcn/ui**
-* 🎯 Strictly typed codebase with **TypeScript**
-* 📦 Modular structure with shared contexts and stores
-* 🌈 Tailwind CSS for utility-first styling
+The `useServerQuery` hook allows components to fetch data **during SSR** and rehydrate seamlessly on the client — no flicker, no double-fetching, and no boilerplate.
 
 ---
 
-## 🚀 Getting Started
+## 🛡️ Obfuscated & Optimized for Production
 
-### 1. Install dependencies
-
-```bash
-pnpm install
-```
-
-### 2. Run in development mode
-
-```bash
-pnpm dev
-```
-
-### 3. Build for production
-
-```bash
-pnpm build
-```
-
-### 4. Start the production server
-
-```bash
-pnpm start
-```
+With `webpack-obfuscator` and `javascript-obfuscator`, your production code is transformed to resist reverse engineering while maintaining blazing runtime performance.
 
 ---
 
-## 📌 Notes
+## 🖼️ UI-Ready Out of the Box
 
-* `client/bootstrap.tsx` handles client-side hydration.
-* `server/hono.tsx` initializes the Hono server and routes.
-* `shared/stores` contains context and stream logic usable in both environments.
-* Tailwind CSS is assumed to be configured (as required by shadcn/ui).
-
----
-
-## 🧠 What `useServerQuery` Does
-
-This custom hook allows you to fetch data **on the server during SSR** and **reuse the result on the client without fetching it again**, preventing flickers or loading spinners post-hydration.
+Style your app with:
+- **shadcn/ui** component system
+- **Radix UI primitives**
+- **TailwindCSS + tailwind-merge**
+- **Animate.css utility classes** (`tw-animate-css`)
 
 ---
 
-### 🔄 How It Works
+## ⚙️ Scripts
 
-Let’s walk through the code in **logical steps**:
-
----
-
-### 🔧 `ServerContext`
-
-```ts
-export interface ServerContextI {
-    isServer: boolean;
-    handlers: Promise<any>[],
-    dataMap: Record<string, any>,
-}
-```
-
-* `isServer`: Indicates if the code is running on the server.
-* `handlers`: An array to collect promises (data fetching) during SSR.
-* `dataMap`: Stores fetched data by `id`, so the same data is accessible during hydration.
-
-```tsx
-const ServerContext = createContext<ServerContextI>({} as ServerContextI);
-```
-
-You wrap your app in `ServerQueryProvider` with this context before rendering. This is done inside your server entry, usually in `server/hono.tsx`.
+| Command       | Description                            |
+|---------------|----------------------------------------|
+| `pnpm dev`    | Build in watch mode with Rspack        |
+| `pnpm build`  | Production build (obfuscation enabled) |
+| `pnpm start`  | Run the built SSR app (Node server)    |
 
 ---
 
-### 🌐 `useServerQuery` Hook Logic
+## 📦 Dependency Highlights
 
-```tsx
-const { data, isLoading } = useServerQuery({ id: "home", handler: () => axios.get(...).then(...) });
-```
-
-#### On the **server**:
-
-1. `context.isServer` is true.
-2. If no data exists for this `id`, it **adds the handler to the `handlers` array** (but doesn’t execute it immediately).
-3. Later in SSR, you `await Promise.all(context.handlers)` to **run all the data fetches in parallel**, before `ReactDOMServer.renderToString()`.
-
-#### On the **client**:
-
-1. On hydration, `context.isServer` is false.
-2. `useEffect()` runs `fetchClient()` only **if the data is not already available** from SSR.
-3. This ensures no refetch if the data was already embedded in `dataMap`.
+- **@rspack/core**, **@rspack/cli** – Core bundler setup
+- **@hono/node-server**, **hono** – Fast HTTP server
+- **tailwindcss**, **postcss-loader** – Styling and CSS utilities
+- **webpack-obfuscator**, **javascript-obfuscator** – Code protection
 
 ---
 
-## 📜 License
+## 🧪 Ready for Expansion
 
-MIT – Use it, build on it, and share it.
+Ideal for:
+- Fullstack React apps
+- Headless CMS integrations
+- E-commerce storefronts
+- Admin dashboards
+- SaaS apps
+
+---
+
+## 🪪 License
+
+MIT © [Your Name or Company]
+
+---
+
+> Built with ❤️ using modern tools to deliver fast, beautiful, and secure web experiences.
 
 ---
 
 Credit: Budi Santoso
+
+---
+
 Email: main.budisantoso@gmail.com
+
+---
