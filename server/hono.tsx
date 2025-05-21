@@ -33,6 +33,10 @@ app.route("/api", api);
 app.get("/favicon.ico", (c) => c.body(null, 204));
 
 app.get("/*", async (c) => {
+  const nonce = crypto.randomUUID();
+  c.res.headers.set("Content-Security-Policy", `script-src 'self' 'nonce-${nonce}'`);
+  // allow other file js assets
+
   try {
     let didError = false;
     const stream = new PassThrough();
@@ -73,8 +77,9 @@ app.get("/*", async (c) => {
           didError = true;
           console.error(err);
           stream.push(new TextEncoder().encode(errorHtml));
-          stream.push(null);
         },
+        nonce,
+        identifierPrefix: "r2h",
         onError(err) {
           didError = true;
           console.error(err);
@@ -91,9 +96,11 @@ app.get("/*", async (c) => {
     }
 
     return streamToResponse(stream);
+
   } catch (error) {
     console.error(error);
     return c.html(errorHtml, 500);
+    
   }
 });
 

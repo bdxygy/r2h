@@ -12,7 +12,7 @@ function Root() {
         <meta charSet="UTF-8" />
         <link rel="icon" type="image/svg+xml" href={Logo} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Rspack + React + TS</title>
+        <title>R2H</title>
         <link href="/public/main.css" rel="stylesheet"></link>
       </head>
       <body>
