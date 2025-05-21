@@ -1,9 +1,44 @@
 import { defineConfig } from "@rspack/cli";
-import { rspack } from "@rspack/core";
+import { NormalModule, rspack } from "@rspack/core";
 import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
 import { RunScriptWebpackPlugin } from "run-script-webpack-plugin";
 import WebpackObfuscator from "webpack-obfuscator";
 import path from "path";
+import pkg from "./package.json" with { type: "json" };
+
+const dependencies: Record<string, string> = pkg.dependencies;
+const devDependencies: Record<string, string> = pkg.devDependencies;
+
+const allDeps: Record<string, string> = {
+  ...dependencies,
+  ...devDependencies,
+};
+
+function hashPkgName(pkgName: string, mode: "development" | "production") {
+  return mode === "development" ? pkgName : Buffer.from(pkgName).toString("hex");
+}
+
+// Buat cacheGroups berdasarkan package, dengan nama vendor-<hex>
+const createCacheGroups = (mode: "development" | "production") => {
+  const groups: Record<string, any> = {};
+
+  for (const key in allDeps) {
+    const depName = hashPkgName(key, mode);
+    const depValue = (allDeps[key] as string).replaceAll("^", "");
+    const depStr = `${depName}@${depValue}`;
+    const pkgName = `v.${depName}`;
+    groups[pkgName] = {
+      test: (module: NormalModule) => {
+        return module.resource.endsWith(".js") && module.resource.includes("node_modules") && module.resource.includes(depStr);
+      },
+      name: pkgName,
+      chunks: "all",
+      enforce: true,
+    };
+  }
+
+  return groups;
+};
 
 // Target browsers, see: https://github.com/browserslist/browserslist
 const targets = ["last 2 versions", "> 0.2%", "not dead", "Firefox ESR"];
@@ -77,38 +112,44 @@ const clientConfig = (mode: "development" | "production") =>
     plugins: [
       mode !== "development"
         ? new WebpackObfuscator({
-            compact: true,
-            controlFlowFlattening: false,
-            deadCodeInjection: false,
-            debugProtection: false,
-            debugProtectionInterval: 0,
-            disableConsoleOutput: false,
-            identifierNamesGenerator: "mangled-shuffled",
-            log: true,
-            numbersToExpressions: false,
-            renameGlobals: false,
-            selfDefending: false,
-            simplify: true,
-            splitStrings: false,
-            stringArray: true,
-            stringArrayCallsTransform: false,
-            stringArrayCallsTransformThreshold: 0.5,
-            stringArrayEncoding: [],
-            stringArrayIndexShift: true,
-            stringArrayRotate: true,
-            stringArrayShuffle: true,
-            stringArrayWrappersCount: 1,
-            stringArrayWrappersChainedCalls: true,
-            stringArrayWrappersParametersMaxCount: 2,
-            stringArrayWrappersType: "function",
-            stringArrayThreshold: 0.75,
-            unicodeEscapeSequence: false,
-            renamePropertiesMode: "safe",
-          })
+          compact: true,
+          controlFlowFlattening: false,
+          deadCodeInjection: false,
+          debugProtection: false,
+          debugProtectionInterval: 0,
+          disableConsoleOutput: false,
+          identifierNamesGenerator: "mangled-shuffled",
+          log: true,
+          numbersToExpressions: false,
+          renameGlobals: false,
+          selfDefending: false,
+          simplify: true,
+          splitStrings: false,
+          stringArray: true,
+          stringArrayCallsTransform: false,
+          stringArrayCallsTransformThreshold: 0.5,
+          stringArrayEncoding: [],
+          stringArrayIndexShift: true,
+          stringArrayRotate: true,
+          stringArrayShuffle: true,
+          stringArrayWrappersCount: 1,
+          stringArrayWrappersChainedCalls: true,
+          stringArrayWrappersParametersMaxCount: 2,
+          stringArrayWrappersType: "function",
+          stringArrayThreshold: 0.75,
+          unicodeEscapeSequence: false,
+          renamePropertiesMode: "safe",
+        })
         : null,
       mode === "development" ? new ReactRefreshRspackPlugin() : null,
     ].filter(Boolean),
     optimization: {
+      splitChunks: {
+        chunks: "all",
+        cacheGroups: {
+          ...createCacheGroups(mode),
+        },
+      },
       minimizer: [
         new rspack.SwcJsMinimizerRspackPlugin(),
         new rspack.LightningCssMinimizerRspackPlugin({
@@ -130,7 +171,7 @@ const serverConfig = (mode: "development" | "production") =>
     output: {
       path: path.resolve(baseOutputPath),
       filename: "server.js",
-      chunkFilename: mode === "development" ? "[name].js" : "[chunkhash].js",
+      chunkFilename: mode === "development" ? "[name].[chunkhash].js" : "[chunkhash].js",
       clean: {
         keep: /public/,
       },
@@ -200,10 +241,10 @@ const serverConfig = (mode: "development" | "production") =>
     },
     plugins: [
       mode === "development" &&
-        new RunScriptWebpackPlugin({
-          name: "server.js",
-          autoRestart: true,
-        }),
+      new RunScriptWebpackPlugin({
+        name: "server.js",
+        autoRestart: true,
+      }),
     ].filter(Boolean),
   });
 

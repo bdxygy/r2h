@@ -7,7 +7,9 @@ export const Home = () => {
     id: "home",
     handler: () =>
       axios
-        .get("http://localhost:32300/api")
+        .get("http://localhost:32300/api", {
+          withCredentials: true,
+        })
         .then((res) => res.data),
   });
 
