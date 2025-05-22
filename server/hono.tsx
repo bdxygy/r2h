@@ -35,7 +35,6 @@ app.get("/favicon.ico", (c) => c.body(null, 204));
 app.get("/*", async (c) => {
   const nonce = crypto.randomUUID();
   c.res.headers.set("Content-Security-Policy", `script-src 'self' 'nonce-${nonce}'`);
-  // allow other file js assets
 
   try {
     let didError = false;
@@ -79,7 +78,6 @@ app.get("/*", async (c) => {
           stream.push(new TextEncoder().encode(errorHtml));
         },
         nonce,
-        identifierPrefix: "r2h",
         onError(err) {
           didError = true;
           console.error(err);
@@ -100,7 +98,7 @@ app.get("/*", async (c) => {
   } catch (error) {
     console.error(error);
     return c.html(errorHtml, 500);
-    
+
   }
 });
 

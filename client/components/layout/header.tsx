@@ -1,7 +1,12 @@
-import { Sheet, SheetTrigger, SheetContent } from "$client/components/ui/sheet";
-import { Button } from "$client/components/ui/button";
 import { Menu } from "lucide-react";
-import { NavLink as Link } from "react-router";
+import { lazy } from "react";
+
+const Button = lazy(() => import("$client/components/ui/button").then(m => ({ default: m.Button })))
+const Sheet = lazy(() => import("$client/components/ui/sheet").then(m => ({ default: m.Sheet })))
+const SheetTrigger = lazy(() => import("$client/components/ui/sheet").then(m => ({ default: m.SheetTrigger })))
+const SheetContent = lazy(() => import("$client/components/ui/sheet").then(m => ({ default: m.SheetContent })))
+const Link = lazy(() => import("react-router").then(m => ({ default: m.NavLink })))
+// const Menu = lazy(() => import("lucide-react").then(m => ({ default: m.Menu })))
 
 export default function Header() {
     return (

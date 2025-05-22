@@ -1,44 +1,9 @@
 import { defineConfig } from "@rspack/cli";
-import { NormalModule, rspack } from "@rspack/core";
+import { rspack } from "@rspack/core";
 import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
 import { RunScriptWebpackPlugin } from "run-script-webpack-plugin";
 import WebpackObfuscator from "webpack-obfuscator";
 import path from "path";
-import pkg from "./package.json" with { type: "json" };
-
-const dependencies: Record<string, string> = pkg.dependencies;
-const devDependencies: Record<string, string> = pkg.devDependencies;
-
-const allDeps: Record<string, string> = {
-  ...dependencies,
-  ...devDependencies,
-};
-
-function hashPkgName(pkgName: string, mode: "development" | "production") {
-  return mode === "development" ? pkgName : Buffer.from(pkgName).toString("hex");
-}
-
-// Buat cacheGroups berdasarkan package, dengan nama vendor-<hex>
-const createCacheGroups = (mode: "development" | "production") => {
-  const groups: Record<string, any> = {};
-
-  for (const key in allDeps) {
-    const depName = hashPkgName(key, mode);
-    const depValue = (allDeps[key] as string).replaceAll("^", "");
-    const depStr = `${depName}@${depValue}`;
-    const pkgName = `v.${depName}`;
-    groups[pkgName] = {
-      test: (module: NormalModule) => {
-        return module.resource.endsWith(".js") && module.resource.includes("node_modules") && module.resource.includes(depStr);
-      },
-      name: pkgName,
-      chunks: "all",
-      enforce: true,
-    };
-  }
-
-  return groups;
-};
 
 // Target browsers, see: https://github.com/browserslist/browserslist
 const targets = ["last 2 versions", "> 0.2%", "not dead", "Firefox ESR"];
@@ -57,7 +22,7 @@ const clientConfig = (mode: "development" | "production") =>
       path: path.resolve(baseOutputPath, "public"),
       clean: true,
       filename: "main.js",
-      chunkFilename: mode === "development" ? "[name].js" : "[chunkhash].js",
+      chunkFilename: mode === "development" ? "[name].js" : "[name][chunkhash].js",
     },
     resolve: {
       extensions: ["...", ".ts", ".tsx", ".jsx"],
@@ -146,9 +111,9 @@ const clientConfig = (mode: "development" | "production") =>
     optimization: {
       splitChunks: {
         chunks: "all",
-        cacheGroups: {
-          ...createCacheGroups(mode),
-        },
+        minSize: 20 * 1024,   // 20 KiB minimum
+        maxSize: 230 * 1024, // 250 KiB
+        hidePathInfo: true
       },
       minimizer: [
         new rspack.SwcJsMinimizerRspackPlugin(),
@@ -156,6 +121,11 @@ const clientConfig = (mode: "development" | "production") =>
           minimizerOptions: { targets },
         }),
       ],
+    },
+    performance: {
+      maxAssetSize: 300 * 1024, // 20 KiB
+      maxEntrypointSize: 500 * 1024,
+      hints: "warning",
     },
     experiments: {
       css: true,
