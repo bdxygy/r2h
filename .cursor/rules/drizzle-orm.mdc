@@ -1,0 +1,136 @@
+---
+description: Drizzle ORM is a headless TypeScript ORM with a head. It’s the only ORM with both relational and SQL-like query APIs, providing you the best of both worlds when it comes to accessing your relational data. Drizzle is lightweight, performant, typesafe, non-lactose, gluten-free, sober, flexible and serverless-ready by design. Drizzle is not just a library, it’s an experience. 🤩
+globs: 
+alwaysApply: false
+---
+name: Drizzle ORM Expert
+author: T3 Chat
+user_message: |
+  You are an expert on the Drizzle ORM. Your primary goal is to answer questions and generate code using Drizzle.
+  - Base your answers on the provided context snippets.
+  - For any information not covered in the snippets, use the `get_library_docs` tool to search the official Drizzle documentation by calling `get_library_docs(library_name='/drizzle-team/drizzle-orm-docs')`.
+  - Always provide concise, accurate, and code-first answers.
+---
+
+TITLE: Counting All Rows in Drizzle ORM (TypeScript, SQL)
+DESCRIPTION: This snippet demonstrates how to count all rows in a table using Drizzle ORM's `count()` function and the `sql` operator. It shows both the direct `count()` usage and how to explicitly cast the result to a number using `mapWith(Number)` when using `sql` for better type control, especially for drivers that return `bigint` as a string. The associated SQL query and Drizzle schema for the `products` table are also provided.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/guides/count-rows.mdx#_snippet_0
+LANGUAGE: TypeScript
+CODE:
+```
+import { count, sql } from 'drizzle-orm';
+import { products } from './schema';
+
+const db = drizzle(...);
+
+await db.select({ count: count() }).from(products);
+
+// Under the hood, the count() function casts its result to a number at runtime.
+await db.select({ count: sql`count(*)`.mapWith(Number) }).from(products);
+```
+
+----------------------------------------
+
+TITLE: Including Related Data with Drizzle ORM 'with' Operator
+DESCRIPTION: Demonstrates how to fetch data from related tables using the 'with' operator in Drizzle ORM's relational query builder. It shows examples for 'findMany' and 'findFirst' operations, as well as chaining nested 'with' statements for deeply related data.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/rqb.mdx#_snippet_7
+LANGUAGE: typescript
+CODE:
+```
+const posts = await db.query.posts.findMany({
+	with: {
+		comments: true,
+	},
+});
+```
+
+----------------------------------------
+
+TITLE: Inferring Select and Insert Types for SingleStore Tables
+DESCRIPTION: This snippet demonstrates how to infer TypeScript types for `select` and `insert` operations from a Drizzle ORM SingleStore table schema. It shows three different methods using `$inferSelect`, `$inferInsert`, and the `InferSelectModel`/`InferInsertModel` helpers to create `SelectUser` and `InsertUser` types based on the `users` table definition.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/goodies.mdx#_snippet_3
+LANGUAGE: TypeScript
+CODE:
+```
+import { int, text, singlestoreTable } from 'drizzle-orm/singlestore-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = singlestoreTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+
+----------------------------------------
+
+TITLE: Performing CRUD Operations with Drizzle ORM and Turso (TypeScript)
+DESCRIPTION: This snippet demonstrates a complete set of CRUD operations (Create, Read, Update, Delete) on a `usersTable` using Drizzle ORM. It initializes a connection to a Turso database, inserts a new user, retrieves all users, updates a user's age, and finally deletes the user, logging each step. It requires `dotenv` for environment variables and `drizzle-orm` for database interactions.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/mdx/get-started/sqlite/QueryTursoUpdated.mdx#_snippet_0
+LANGUAGE: TypeScript
+CODE:
+```
+import 'dotenv/config';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/libsql';
+import { usersTable } from './db/schema';
+
+async function main() {
+  const db = drizzle({
+    connection: {
+        url: process.env.TURSO_DATABASE_URL!,
+        authToken: process.env.TURSO_AUTH_TOKEN!
+    }
+  });
+
+  const user: typeof usersTable.$inferInsert = {
+    name: 'John',
+    age: 30,
+    email: 'john@example.com',
+    phone: '123-456-7890'
+  };
+
+  await db.insert(usersTable).values(user);
+  const users = await db.select().from(usersTable);
+  await db.update(usersTable).set({ age: 31 }).where(eq(usersTable.email, user.email));
+  await db.delete(usersTable).where(eq(usersTable.email, user.email));
+}
+
+main();
+```
+
+----------------------------------------
+
+TITLE: Defining User and Post Schema with Relations (TypeScript)
+DESCRIPTION: This TypeScript code defines a Drizzle ORM schema for `users` and `posts` tables using `pgTable` for PostgreSQL. It establishes one-to-many relationships between users and posts using the `relations` helper, enabling relational queries.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/migrate/components.mdx#_snippet_2
+LANGUAGE: typescript
+CODE:
+```
+import { integer, serial, text, pgTable } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+export const users = pgTable('users', {
+	id: serial('id').primaryKey(),
+	name: text('name').notNull(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+	posts: many(posts),
+}));
+
+export const posts = pgTable('posts', {
+	id: serial('id').primaryKey(),
+	content: text('content').notNull(),
+	authorId: integer('author_id').notNull(),
+});
+
+export const postsRelations = relations(posts, ({ one }) => ({
+	author: one(users, { fields: [posts.authorId], references: [users.id] }),
+}));
+```

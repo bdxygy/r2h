@@ -1,0 +1,2279 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.cursor/
+  rules/
+    better-auth.mdc
+    drizzle-orm.mdc
+    hono.mdc
+client/
+  assets/
+    react.svg
+  components/
+    layout/
+      header.tsx
+    ui/
+      accordion.tsx
+      button.tsx
+      dialog.tsx
+      sheet.tsx
+  hooks/
+    use-document.ts
+    use-window.ts
+  libs/
+    utils.ts
+  pages/
+    about.tsx
+    Home.tsx
+  App.tsx
+  bootstrap.tsx
+  main.css
+  main.tsx
+  react-env.d.ts
+  Root.tsx
+  router.tsx
+server/
+  routes/
+    auth.ts
+  api.ts
+  hono.tsx
+  index.ts
+shared/
+  server-context.tsx
+  stream.ts
+.gitignore
+components.json
+package.json
+pnpm-workspace.yaml
+postcss.config.mjs
+README.md
+rspack.config.ts
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".cursor/rules/better-auth.mdc">
+---
+description: Better Auth is a framework-agnostic authentication and authorization framework for TypeScript. It provides a comprehensive set of features out of the box and includes a plugin ecosystem that simplifies adding advanced functionalities. Whether you need 2FA, multi-tenancy, multi-session support, or even enterprise features like SSO, it lets you focus on building your application instead of reinventing the wheel.
+globs: 
+alwaysApply: false
+---
+name: Better-Auth Expert
+author: T3 Chat
+user_message: |
+  You are an expert on the Better-Auth library. Your primary goal is to answer questions and generate code for implementing authentication.
+  - Base your answers on the provided context snippets.
+  - For any information not covered in the snippets, use the `get_library_docs` tool to search the official Better-Ame calling `get_library_docs(library_name='/better-auth/better-auth')`.
+  - Always provide concise, accurate, and code-first answers.
+---
+
+TITLE: Basic BetterAuth Setup
+DESCRIPTION: This snippet shows how to initialize BetterAuth with a database adapter (e.g., Drizzle) and a set of authentication strategies.
+LANGUAGE: TypeScript
+CODE:
+```
+import { BetterAuth } from "@better-auth/core";
+import { DrizzleAdapter } from "@better-auth/drizzle-adapter";
+import { db, users, sessions } from "./db";
+
+export const auth = new BetterAuth({
+  adapter: DrizzleAdapter(db, users, sessions),
+  strategies: {
+    // ... strategies go here
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Email & Password Strategy
+DESCRIPTION: Demonstrates how to configure the email and password authentication strategy. It includes a `verify` function to look up the user and check their password.
+LANGUAGE: TypeScript
+CODE:
+```
+import { BetterAuth } from "@better-auth/core";
+import { EmailStrategy } from "@better-auth/email";
+import { DrizzleAdapter } from "@better-auth/drizzle-adapter";
+import { db, users, sessions } from "./db";
+import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+
+export const auth = new BetterAuth({
+  adapter: DrizzleAdapter(db, users, sessions),
+  strategies: {
+    email: EmailStrategy({
+      verify: async (credentials) => {
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, credentials.email));
+        if (!user || !await bcrypt.compare(credentials.password, user.password)) {
+          return null;
+        }
+        return user;
+      },
+    }),
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Protecting Routes
+DESCRIPTION: This snippet shows how to protect API routes or server pages using the `auth.protect()` method. It ensures that only authenticated users can access the protected resource.
+LANGUAGE: TypeScript
+CODE:
+```
+import { auth } from "./auth"; // your auth config
+
+// Example with a Hono route
+app.get("/protected", auth.protect(), (c) => {
+  const user = c.get("user"); // The authenticated user is available in the context
+  return c.json({ message: `Welcome, ${user.email}` });
+});
+```
+
+----------------------------------------
+
+TITLE: Handling Login and Logout
+DESCRIPTION: Shows how to create API endpoints to handle user login and logout using the `auth.handle` method.
+LANGUAGE: TypeScript
+CODE:
+```
+import { Hono } from "hono";
+import { auth } from "./auth"; // your auth config
+
+const app = new Hono().basePath("/api/auth");
+
+// This will create routes like /api/auth/email/login, /api/auth/logout
+app.route("/", auth.handle);
+
+export default app;
+```
+
+----------------------------------------
+
+TITLE: Google OAuth2 Strategy
+DESCRIPTION: This snippet demonstrates how tthe Google OAuth2 strategy, requiring client ID, client secret, and a callback URL from your environment variables.
+LANGUAGE: TypeScript
+CODE:
+```
+import { BetterAuth } from "@better-auth/core";
+import { GoogleStrategy } from "@better-auth/google";
+import { DrizzleAdapter } from "@better-auth/drizzle-adapter";
+import { db, users, sessions, accounts } from "./db";
+
+export const auth = new BetterAuth({
+  adapter: DrizzleAdapter(db, users, sessions, accounts),
+  strategies: {
+    google: GoogleStrategy({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/api/auth/google/callback",
+      scope: ["profile", "email"],
+    }),
+  },
+});
+```
+</file>
+
+<file path=".cursor/rules/drizzle-orm.mdc">
+---
+description: Drizzle ORM is a headless TypeScript ORM with a head. It’s the only ORM with both relational and SQL-like query APIs, providing you the best of both worlds when it comes to accessing your relational data. Drizzle is lightweight, performant, typesafe, non-lactose, gluten-free, sober, flexible and serverless-ready by design. Drizzle is not just a library, it’s an experience. 🤩
+globs: 
+alwaysApply: false
+---
+name: Drizzle ORM Expert
+author: T3 Chat
+user_message: |
+  You are an expert on the Drizzle ORM. Your primary goal is to answer questions and generate code using Drizzle.
+  - Base your answers on the provided context snippets.
+  - For any information not covered in the snippets, use the `get_library_docs` tool to search the official Drizzle documentation by calling `get_library_docs(library_name='/drizzle-team/drizzle-orm-docs')`.
+  - Always provide concise, accurate, and code-first answers.
+---
+
+TITLE: Counting All Rows in Drizzle ORM (TypeScript, SQL)
+DESCRIPTION: This snippet demonstrates how to count all rows in a table using Drizzle ORM's `count()` function and the `sql` operator. It shows both the direct `count()` usage and how to explicitly cast the result to a number using `mapWith(Number)` when using `sql` for better type control, especially for drivers that return `bigint` as a string. The associated SQL query and Drizzle schema for the `products` table are also provided.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/guides/count-rows.mdx#_snippet_0
+LANGUAGE: TypeScript
+CODE:
+```
+import { count, sql } from 'drizzle-orm';
+import { products } from './schema';
+
+const db = drizzle(...);
+
+await db.select({ count: count() }).from(products);
+
+// Under the hood, the count() function casts its result to a number at runtime.
+await db.select({ count: sql`count(*)`.mapWith(Number) }).from(products);
+```
+
+----------------------------------------
+
+TITLE: Including Related Data with Drizzle ORM 'with' Operator
+DESCRIPTION: Demonstrates how to fetch data from related tables using the 'with' operator in Drizzle ORM's relational query builder. It shows examples for 'findMany' and 'findFirst' operations, as well as chaining nested 'with' statements for deeply related data.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/rqb.mdx#_snippet_7
+LANGUAGE: typescript
+CODE:
+```
+const posts = await db.query.posts.findMany({
+	with: {
+		comments: true,
+	},
+});
+```
+
+----------------------------------------
+
+TITLE: Inferring Select and Insert Types for SingleStore Tables
+DESCRIPTION: This snippet demonstrates how to infer TypeScript types for `select` and `insert` operations from a Drizzle ORM SingleStore table schema. It shows three different methods using `$inferSelect`, `$inferInsert`, and the `InferSelectModel`/`InferInsertModel` helpers to create `SelectUser` and `InsertUser` types based on the `users` table definition.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/goodies.mdx#_snippet_3
+LANGUAGE: TypeScript
+CODE:
+```
+import { int, text, singlestoreTable } from 'drizzle-orm/singlestore-core';
+import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
+
+const users = singlestoreTable('users', {
+  id: int('id').primaryKey(),
+  name: text('name').notNull(),
+});
+
+type SelectUser = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
+// or
+type SelectUser = InferSelectModel<typeof users>;
+type InsertUser = InferInsertModel<typeof users>;
+```
+
+----------------------------------------
+
+TITLE: Performing CRUD Operations with Drizzle ORM and Turso (TypeScript)
+DESCRIPTION: This snippet demonstrates a complete set of CRUD operations (Create, Read, Update, Delete) on a `usersTable` using Drizzle ORM. It initializes a connection to a Turso database, inserts a new user, retrieves all users, updates a user's age, and finally deletes the user, logging each step. It requires `dotenv` for environment variables and `drizzle-orm` for database interactions.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/mdx/get-started/sqlite/QueryTursoUpdated.mdx#_snippet_0
+LANGUAGE: TypeScript
+CODE:
+```
+import 'dotenv/config';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/libsql';
+import { usersTable } from './db/schema';
+
+async function main() {
+  const db = drizzle({
+    connection: {
+        url: process.env.TURSO_DATABASE_URL!,
+        authToken: process.env.TURSO_AUTH_TOKEN!
+    }
+  });
+
+  const user: typeof usersTable.$inferInsert = {
+    name: 'John',
+    age: 30,
+    email: 'john@example.com',
+    phone: '123-456-7890'
+  };
+
+  await db.insert(usersTable).values(user);
+  const users = await db.select().from(usersTable);
+  await db.update(usersTable).set({ age: 31 }).where(eq(usersTable.email, user.email));
+  await db.delete(usersTable).where(eq(usersTable.email, user.email));
+}
+
+main();
+```
+
+----------------------------------------
+
+TITLE: Defining User and Post Schema with Relations (TypeScript)
+DESCRIPTION: This TypeScript code defines a Drizzle ORM schema for `users` and `posts` tables using `pgTable` for PostgreSQL. It establishes one-to-many relationships between users and posts using the `relations` helper, enabling relational queries.
+SOURCE: https://github.com/drizzle-team/drizzle-orm-docs/blob/main/src/content/docs/migrate/components.mdx#_snippet_2
+LANGUAGE: typescript
+CODE:
+```
+import { integer, serial, text, pgTable } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+export const users = pgTable('users', {
+	id: serial('id').primaryKey(),
+	name: text('name').notNull(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+	posts: many(posts),
+}));
+
+export const posts = pgTable('posts', {
+	id: serial('id').primaryKey(),
+	content: text('content').notNull(),
+	authorId: integer('author_id').notNull(),
+});
+
+export const postsRelations = relations(posts, ({ one }) => ({
+	author: one(users, { fields: [posts.authorId], references: [users.id] }),
+}));
+```
+</file>
+
+<file path=".cursor/rules/hono.mdc">
+---
+description: Any backend API related work. Hono is a small, simple, and ultrafast web framework built on Web Standards. It works on any JavaScript runtime: Cloudflare Workers, Fastly Compute, Deno, Bun, Vercel, Netlify, AWS Lambda, Lambda@Edge, and Node.js.
+globs: 
+alwaysApply: false
+---
+name: Hono Expert
+author: T3 Chat
+user_message: |
+  You are an expert on the Hono web framework. Your primary goal is to answer questions and generate code for Hono applications.
+  - Base your answers on the provided context snippets.
+  - For any information not covered in the snippets, use the `get_library_docs` tool to search the official Hono documentation by calling `get_library_docs(library_name='/honojs/hono')`.
+  - Always provide concise, accurate, and code-first answers.
+---
+
+TITLE: Basic Hono "Hello World"
+DESCRIPTION: This snippet shows the most basic Hono application. It creates a new Hono instance and defines a single GET route at the root ('/') that returns a "Hello Hono!" text response.
+LANGUAGE: TypeScript
+CODE:
+```
+import { Hono } from 'hono'
+const app = new Hono()
+
+app.get('/', (c) => {
+  return c.text('Hello Hono!')
+})
+
+export default app
+```
+
+----------------------------------------
+
+TITLE: Hono Routing
+DESCRIPTION: Demonstrates basic routing in Hono. It shows how to handle different HTTP methods like GET and POST, and how to access path parameters from the URL.
+LANGUAGE: TypeScript
+CODE:
+```
+import { Hono } from 'hono'
+const app = new Hono()
+
+// GET method
+app.get('/api/posts', (c) => {
+  return c.json({ message: 'All posts' })
+})
+
+// POST method
+app.post('/api/posts', (c) => {
+  return c.json({ message: 'Post created' }, 201)
+})
+
+// Path parameters
+app.get('/api/posts/:id', (c) => {
+  const id = c.req.param('id')
+  return c.json({ message: `Post with id ${id}` })
+})
+
+export default app
+```
+
+----------------------------------------
+
+TITLE: Hono Middleware
+DESCRIPTION: This snippet illustrates how to create and use middleware in Hono. A simple logger middleware is defined, which logs the request method and path before passing control to the next middleware or the route handler using `next()`.
+LANGUAGE: TypeScript
+CODE:
+```
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+// Logger middleware
+app.use('*', async (c, next) => {
+  console.log(`[${c.req.method}] ${c.req.path}`)
+  await next()
+})
+
+app.get('/', (c) => c.text('Hello!'))
+
+export default app
+```
+
+----------------------------------------
+
+TITLE: Using Hono Validators
+DESCRIPTION: Shows how to use Hono's built-in validator middleware to validate incoming data like query parameters, JSON bodies, and headers. The `vValidator` function is used to define validation rules with Zod schemas.
+LANGUAGE: TypeScript
+CODE:
+```
+import { Hono } from 'hono'
+import { z } from 'zod'
+import { vValidator } from '@hono/zod-validator'
+
+const app = new Hono()
+
+const schema = z.object({
+  name: z.string(),
+  age: z.number(),
+})
+
+app.post(
+  '/user',
+  vValidator('json', schema, (result, c) => {
+    if (!result.success) {
+      return c.json({ message: 'Validation failed' }, 400)
+    }
+  }),
+  (c) => {
+    const { name, age } = c.req.valid('json')
+    return c.json({
+      message: `Welcome, ${name}! You are ${age} years old.`,
+    })
+  }
+)
+
+export default app
+```
+</file>
+
+<file path="pnpm-workspace.yaml">
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - javascript-obfuscator
+</file>
+
+<file path="client/assets/react.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="client/components/ui/accordion.tsx">
+import * as React from "react"
+import * as AccordionPrimitive from "@radix-ui/react-accordion"
+import { ChevronDownIcon } from "lucide-react"
+
+import { cn } from "$client/libs/utils"
+
+function Accordion({
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Root>) {
+  return <AccordionPrimitive.Root data-slot="accordion" {...props} />
+}
+
+function AccordionItem({
+  className,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Item>) {
+  return (
+    <AccordionPrimitive.Item
+      data-slot="accordion-item"
+      className={cn("border-b last:border-b-0", className)}
+      {...props}
+    />
+  )
+}
+
+function AccordionTrigger({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+  return (
+    <AccordionPrimitive.Header className="flex">
+      <AccordionPrimitive.Trigger
+        data-slot="accordion-trigger"
+        className={cn(
+          "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  )
+}
+
+function AccordionContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+  return (
+    <AccordionPrimitive.Content
+      data-slot="accordion-content"
+      className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm"
+      {...props}
+    >
+      <div className={cn("pt-0 pb-4", className)}>{children}</div>
+    </AccordionPrimitive.Content>
+  )
+}
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+</file>
+
+<file path="client/components/ui/button.tsx">
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "$client/libs/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot : "button"
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
+
+export { Button, buttonVariants }
+</file>
+
+<file path="client/components/ui/dialog.tsx">
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { XIcon } from "lucide-react"
+
+import { cn } from "$client/libs/utils"
+
+function Dialog({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+}
+
+function DialogTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+}
+
+function DialogPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+}
+
+function DialogClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
+
+function DialogOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  return (
+    <DialogPortal data-slot="dialog-portal">
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <XIcon />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+}
+
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn(
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn("text-lg leading-none font-semibold", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+}
+</file>
+
+<file path="client/components/ui/sheet.tsx">
+import * as React from "react"
+import * as SheetPrimitive from "@radix-ui/react-dialog"
+import { XIcon } from "lucide-react"
+
+import { cn } from "$client/libs/utils"
+
+function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+}
+
+function SheetTrigger({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+}
+
+function SheetClose({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Close>) {
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+}
+
+function SheetPortal({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+}
+
+function SheetOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+  return (
+    <SheetPrimitive.Overlay
+      data-slot="sheet-overlay"
+      className={cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function SheetContent({
+  className,
+  children,
+  side = "right",
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+  side?: "top" | "right" | "bottom" | "left"
+}) {
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        data-slot="sheet-content"
+        className={cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          side === "right" &&
+            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+          side === "left" &&
+            "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+          side === "top" &&
+            "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
+          side === "bottom" &&
+            "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">
+          <XIcon className="size-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+}
+
+function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-header"
+      className={cn("flex flex-col gap-1.5 p-4", className)}
+      {...props}
+    />
+  )
+}
+
+function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-footer"
+      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      {...props}
+    />
+  )
+}
+
+function SheetTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Title>) {
+  return (
+    <SheetPrimitive.Title
+      data-slot="sheet-title"
+      className={cn("text-foreground font-semibold", className)}
+      {...props}
+    />
+  )
+}
+
+function SheetDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Description>) {
+  return (
+    <SheetPrimitive.Description
+      data-slot="sheet-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+}
+</file>
+
+<file path="client/hooks/use-document.ts">
+import { useState, useEffect } from "react";
+
+export const useDocument = () => {
+    const [documentValue, setDocumentValue] = useState<Document | null>(null);
+    useEffect(() => {
+        setDocumentValue(() => document);
+    }, []);
+    return documentValue;
+}
+</file>
+
+<file path="client/hooks/use-window.ts">
+import { useState, useEffect } from "react";
+export const useWindow = () => {
+  const [windowValue, setWindowValue] = useState<Window | null>(null);
+  useEffect(() => {
+    setWindowValue(() => window);
+  }, []);
+  return windowValue;
+};
+</file>
+
+<file path="client/libs/utils.ts">
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs))
+}
+</file>
+
+<file path="client/react-env.d.ts">
+// CSS modules
+type CSSModuleClasses = { readonly [key: string]: string };
+
+declare module "*.module.css" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.scss" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.sass" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.less" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.styl" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.stylus" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.pcss" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+declare module "*.module.sss" {
+	const classes: CSSModuleClasses;
+	export default classes;
+}
+
+// CSS
+declare module "*.css" {
+	/**
+	 * @deprecated Use `import style from './style.css?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.scss" {
+	/**
+	 * @deprecated Use `import style from './style.scss?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.sass" {
+	/**
+	 * @deprecated Use `import style from './style.sass?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.less" {
+	/**
+	 * @deprecated Use `import style from './style.less?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.styl" {
+	/**
+	 * @deprecated Use `import style from './style.styl?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.stylus" {
+	/**
+	 * @deprecated Use `import style from './style.stylus?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.pcss" {
+	/**
+	 * @deprecated Use `import style from './style.pcss?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+declare module "*.sss" {
+	/**
+	 * @deprecated Use `import style from './style.sss?inline'` instead.
+	 */
+	const css: string;
+	export default css;
+}
+
+// images
+declare module "*.png" {
+	const src: string;
+	export default src;
+}
+declare module "*.jpg" {
+	const src: string;
+	export default src;
+}
+declare module "*.jpeg" {
+	const src: string;
+	export default src;
+}
+declare module "*.jfif" {
+	const src: string;
+	export default src;
+}
+declare module "*.pjpeg" {
+	const src: string;
+	export default src;
+}
+declare module "*.pjp" {
+	const src: string;
+	export default src;
+}
+declare module "*.gif" {
+	const src: string;
+	export default src;
+}
+declare module "*.svg" {
+	const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>;
+	const content: string;
+
+	export { ReactComponent };
+	export default content;
+}
+declare module "*.ico" {
+	const src: string;
+	export default src;
+}
+declare module "*.webp" {
+	const src: string;
+	export default src;
+}
+declare module "*.avif" {
+	const src: string;
+	export default src;
+}
+
+// media
+declare module "*.mp4" {
+	const src: string;
+	export default src;
+}
+declare module "*.webm" {
+	const src: string;
+	export default src;
+}
+declare module "*.ogg" {
+	const src: string;
+	export default src;
+}
+declare module "*.mp3" {
+	const src: string;
+	export default src;
+}
+declare module "*.wav" {
+	const src: string;
+	export default src;
+}
+declare module "*.flac" {
+	const src: string;
+	export default src;
+}
+declare module "*.aac" {
+	const src: string;
+	export default src;
+}
+
+declare module "*.opus" {
+	const src: string;
+	export default src;
+}
+
+// fonts
+declare module "*.woff" {
+	const src: string;
+	export default src;
+}
+declare module "*.woff2" {
+	const src: string;
+	export default src;
+}
+declare module "*.eot" {
+	const src: string;
+	export default src;
+}
+declare module "*.ttf" {
+	const src: string;
+	export default src;
+}
+declare module "*.otf" {
+	const src: string;
+	export default src;
+}
+
+// other
+declare module "*.webmanifest" {
+	const src: string;
+	export default src;
+}
+declare module "*.pdf" {
+	const src: string;
+	export default src;
+}
+declare module "*.txt" {
+	const src: string;
+	export default src;
+}
+</file>
+
+<file path="client/router.tsx">
+import { lazy } from "react";
+import { Routes, Route } from "react-router";
+
+const Home = lazy(() => import("$client/pages/home"));
+const About = lazy(() => import("$client/pages/about"));
+const Router = () => (<Routes>
+    <Route path="/" Component={Home} />
+    <Route path="/about" Component={About} />
+</Routes>);
+
+
+export default Router
+</file>
+
+<file path="server/routes/auth.ts">
+import { Hono } from "hono";
+import {
+    setSignedCookie,
+} from 'hono/cookie'
+
+export const authRoutes = new Hono({
+    strict: false
+});
+
+authRoutes.get("/", async (c) => {
+
+    await setSignedCookie(c, "foo", "bar", Buffer.from("secret", "utf-8"), {
+        httpOnly: true
+    });
+
+    return c.html("Please Check the Cookies");
+});
+
+authRoutes.get("/check", async (c) => {
+    return c.json({ status: true });
+})
+</file>
+
+<file path="server/index.ts">
+import { serve } from "@hono/node-server";
+
+import("./hono").then(({ default: m }) => {
+  serve(
+    {
+      port: 32300,
+      fetch: m.fetch,
+    },
+    (info) => {
+      console.log(`Listening on http://localhost:${info.port}`);
+    }
+  );
+});
+</file>
+
+<file path="shared/server-context.tsx">
+import { createContext, useContext, useEffect, useState } from "react";
+
+export interface ServerContextI {
+    isServer: boolean;
+    handlers: Promise<any>[],
+    dataMap: Record<string, any>,
+}
+
+const ServerContext = createContext<ServerContextI>({} as ServerContextI);
+
+export const ServerQueryProvider = ({ value, children }: { value: ServerContextI, children: React.ReactNode }) => {
+    return <ServerContext.Provider value={value}>{children}</ServerContext.Provider>;
+}
+
+export interface ServerQueryProps {
+    id: string;
+    handler: () => Promise<any>;
+}
+
+export const useServerQuery = ({ id, handler }: ServerQueryProps) => {
+
+    const context = useContext(ServerContext);
+
+    const [data, setData] = useState<any>(() => {
+        return context.dataMap[id] ?? null;
+    });
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [error, setError] = useState(null);
+
+    const fetchPromise = () => handler().then((res) => {
+        context.dataMap[id] = res;
+        setData(res);
+    }).catch((err) => setError(err));
+
+    const fetchClient = () => {
+        if (!context.dataMap[id]) {
+            setIsLoading(true);
+        };
+
+        fetchPromise()
+            .finally(() => setIsLoading(false));
+    }
+
+    useEffect(() => {
+        if (context.isServer || typeof window === "undefined") return;
+
+        fetchClient()
+    }, [])
+
+    if (context.isServer && context.dataMap[id] === undefined) {
+        context.handlers.push(fetchPromise());
+    }
+
+    return { isLoading, data, error };
+}
+</file>
+
+<file path="components.json">
+{
+    "$schema": "https://ui.shadcn.com/schema.json",
+    "style": "new-york",
+    "rsc": false,
+    "tsx": true,
+    "tailwind": {
+        "config": "",
+        "css": "client/main.css",
+        "baseColor": "neutral",
+        "cssVariables": true,
+        "prefix": ""
+    },
+    "aliases": {
+        "components": "$client/components",
+        "utils": "$client/libs/utils",
+        "ui": "$client/components/ui",
+        "lib": "$client/libs",
+        "hooks": "$client/hooks"
+    },
+    "iconLibrary": "lucide"
+}
+</file>
+
+<file path="postcss.config.mjs">
+export default {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+</file>
+
+<file path="client/components/layout/header.tsx">
+import { Menu } from "lucide-react";
+import { lazy } from "react";
+
+const Button = lazy(() => import("$client/components/ui/button").then(m => ({ default: m.Button })))
+const Sheet = lazy(() => import("$client/components/ui/sheet").then(m => ({ default: m.Sheet })))
+const SheetTrigger = lazy(() => import("$client/components/ui/sheet").then(m => ({ default: m.SheetTrigger })))
+const SheetContent = lazy(() => import("$client/components/ui/sheet").then(m => ({ default: m.SheetContent })))
+const Link = lazy(() => import("react-router").then(m => ({ default: m.NavLink })))
+// const Menu = lazy(() => import("lucide-react").then(m => ({ default: m.Menu })))
+
+export default function Header() {
+    return (
+        <header className="w-full border-b shadow-sm">
+            <div className="container flex items-center justify-between h-16">
+                {/* Logo */}
+                <Link to="/" className="text-xl font-bold">
+                    MySite
+                </Link>
+
+                {/* Desktop Nav */}
+                <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <Link to="/" className="hover:text-primary">Home</Link>
+                    <Link to="/about" className="hover:text-primary">About</Link>
+                </nav>
+
+                {/* Mobile Nav */}
+                <div className="md:hidden">
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Menu className="w-5 h-5" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right">
+                            <div className="flex flex-col space-y-4 mt-10">
+                                <Link to="/" className="text-lg font-medium">Home</Link>
+                                <Link to="/about" className="text-lg font-medium">About</Link>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            </div>
+        </header>
+    );
+}
+</file>
+
+<file path="client/App.tsx">
+import { lazy } from "react";
+
+import "./app.css";
+
+const Router = lazy(() => import("./router"));
+const Header = lazy(() => import("./components/layout/header"));
+
+function App() {
+  return (
+    <>
+      <Header />
+      <Router />
+    </>
+  );
+}
+
+export default App;
+</file>
+
+<file path="client/main.css">
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+</file>
+
+<file path="client/main.tsx">
+import "./main.css";
+// import 'dotenv/config';
+
+import("./bootstrap").then(({ main }) => main());
+</file>
+
+<file path="server/api.ts">
+import { Hono } from "hono";
+import { authRoutes } from "./routes/auth";
+import { getSignedCookie } from "hono/cookie";
+
+const api = new Hono({
+    strict: true
+});
+
+api.get("/", async (c) => {
+    const cookie = c.req.header("cookie");
+
+    console.log({ cookie })
+
+    const foo = await getSignedCookie(c, Buffer.from("secret", "utf-8"), "foo");
+
+    if (foo) return c.text(`Hello ${foo}`)
+
+    return c.text("Hello world!")
+});
+
+api.route("auth", authRoutes)
+
+
+export default api
+</file>
+
+<file path="shared/stream.ts">
+import { JSX } from "react";
+import { renderToPipeableStream } from "react-dom/server";
+import { Readable } from "stream";
+import { ServerContextI } from "./server-context";
+
+// Helper function to convert Node.js stream to Response using PassThrough
+export const streamToResponse = (stream: Readable): Response => {
+    return new Response(
+        Readable.toWeb(stream) as unknown as ReadableStream<Uint8Array>,
+        {
+            headers: {
+                "content-type": "text/html",
+            },
+        }
+    );
+};
+
+export const getDataMapFromPipeStream = (
+    component: JSX.Element,
+    serverContext: ServerContextI
+): Promise<ServerContextI> => {
+    return new Promise((resolve, reject) => {
+        renderToPipeableStream(component, {
+            onShellReady: () => {
+                const newContext = { ...serverContext };
+                Promise.all(newContext.handlers).then(() => {
+                    newContext.handlers = [];
+                    newContext.isServer = false;
+                    resolve(newContext);
+                });
+            },
+            onShellError(err) {
+                reject(err);
+            },
+            onError(err) {
+                reject(err);
+            },
+        });
+    });
+};
+</file>
+
+<file path=".gitignore">
+# Local
+.DS_Store
+*.local
+*.log*
+
+# Dist
+node_modules
+_module
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+
+# Environments
+.env.client.development
+.env.client.production
+.env.server.development
+.env.server.production
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["DOM", "ES2020"],
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": false,
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "$client/*": ["client/*"],
+      "$server/*": ["server/*"],
+      "$shared/*": ["shared/*"]
+    }
+  },
+  "include": ["client", "server", "shared"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext"
+    }
+  }
+}
+</file>
+
+<file path="client/pages/about.tsx">
+import axios from "axios";
+
+import { useServerQuery } from "$shared/server-context";
+
+export const About = () => {
+  const { data, isLoading, error } = useServerQuery({
+    id: "About",
+    handler: () =>
+      axios
+        .get("https://jsonplaceholder.typicode.com/users/1")
+        .then((res) => res.data),
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>{JSON.stringify(error)}</div>;
+
+  return (
+    <div>
+      <h1>About</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+};
+
+export default About;
+</file>
+
+<file path="client/bootstrap.tsx">
+import { lazy, StrictMode } from "react";
+import { ServerContextI, ServerQueryProvider } from "$shared/server-context";
+
+const Root = lazy(() => import("./root"));
+const BrowserRouter = lazy(() => import("react-router").then(m => ({ default: m.BrowserRouter })));
+declare global {
+  interface Window {
+    __SERVER_QUERY__: Record<string, any>;
+  }
+}
+
+export const main = () => {
+  import("react-dom/client").then(({ hydrateRoot }) => {
+    hydrateRoot(
+      document,
+      <StrictMode>
+        <ServerQueryProvider
+          value={{ dataMap: window.__SERVER_QUERY__ } as ServerContextI}
+        >
+          <BrowserRouter>
+            <Root />
+          </BrowserRouter>
+        </ServerQueryProvider>
+      </StrictMode>
+    );
+  })
+};
+</file>
+
+<file path="client/Root.tsx">
+import { lazy } from "react";
+
+import Logo from "./assets/react.svg";
+import "./Root.css";
+
+const App = lazy(() => import("./app"));
+
+function Root() {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href={Logo} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>R2H</title>
+        <link href="/public/main.css" rel="stylesheet"></link>
+      </head>
+      <body>
+        <div id="root">
+          <App />
+        </div>
+      </body>
+    </html>
+  );
+}
+
+export default Root;
+</file>
+
+<file path="server/hono.tsx">
+import { Hono } from "hono";
+import { compress } from "hono/compress";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { renderToPipeableStream } from "react-dom/server";
+import { StaticRouter } from "react-router";
+import { lazy } from "react";
+import { PassThrough } from "stream";
+
+import { getDataMapFromPipeStream, streamToResponse } from "$shared/stream";
+import { ServerContextI, ServerQueryProvider } from "$shared/server-context";
+
+import api from "./api";
+
+const Root = lazy(() => import("$client/root"));
+
+const errorHtml =
+  "<!DOCTYPE html><html><body><h1>Something went wrong</h1></body></html>";
+
+const app = new Hono({
+  strict: false,
+});
+
+app.use(
+  compress({
+    encoding: "gzip",
+  })
+);
+
+app.use("/public/*", serveStatic({ root: "./_module" }));
+
+app.route("/api", api);
+
+app.get("/favicon.ico", (c) => c.body(null, 204));
+
+app.get("/*", async (c) => {
+  const nonce = crypto.randomUUID();
+  c.res.headers.set("Content-Security-Policy", `script-src 'self' 'nonce-${nonce}'`);
+
+  try {
+    let didError = false;
+    const stream = new PassThrough();
+
+    const serverContext: ServerContextI = {
+      isServer: true,
+      handlers: [],
+      dataMap: {},
+    };
+
+    const componentFn = (sc: ServerContextI) => (
+      <ServerQueryProvider value={sc}>
+        <StaticRouter location={c.req.path}>
+          <Root />
+        </StaticRouter>
+      </ServerQueryProvider>
+    );
+
+    const newServerContext = await getDataMapFromPipeStream(
+      componentFn(serverContext),
+      serverContext
+    );
+
+    const { pipe, abort } = renderToPipeableStream(
+      componentFn(newServerContext),
+      {
+        bootstrapModules: [
+          {
+            src: "/public/main.js",
+          },
+        ],
+        bootstrapScriptContent: `
+            window.__SERVER_QUERY__ = ${JSON.stringify(newServerContext.dataMap)};`,
+        onShellReady: () => {
+          pipe(stream);
+        },
+        onShellError(err) {
+          didError = true;
+          console.error(err);
+          stream.push(new TextEncoder().encode(errorHtml));
+        },
+        nonce,
+        onError(err) {
+          didError = true;
+          console.error(err);
+        },
+      }
+    );
+
+    c.req.raw.signal.addEventListener("abort", () => {
+      abort();
+    });
+
+    if (didError) {
+      throw new Error("Something went wrong");
+    }
+
+    return streamToResponse(stream);
+
+  } catch (error) {
+    console.error(error);
+    return c.html(errorHtml, 500);
+
+  }
+});
+
+export default app;
+</file>
+
+<file path="client/pages/Home.tsx">
+import axios from "axios";
+
+import { useServerQuery } from "$shared/server-context";
+
+export const Home = () => {
+  const { data, isLoading, error } = useServerQuery({
+    id: "home",
+    handler: () =>
+      axios
+        .get("http://localhost:32300/api", {
+          withCredentials: true,
+        })
+        .then((res) => res.data),
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>{JSON.stringify(error)}</div>;
+
+  return (
+    <div>
+      <h1>Home</h1>
+      <h2>{data}</h2>
+    </div>
+  );
+};
+
+export default Home;
+</file>
+
+<file path="package.json">
+{
+  "name": "r2h",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "rspack build --mode development --watch",
+    "build": "rspack build --mode production",
+    "start": "node _module/server.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.1",
+    "@radix-ui/react-accordion": "^1.2.10",
+    "@radix-ui/react-dialog": "^1.1.13",
+    "@radix-ui/react-slot": "^1.2.2",
+    "axios": "^1.9.0",
+    "better-auth": "^1.2.10",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.5.0",
+    "hono": "^4.7.9",
+    "lucide-react": "^0.510.0",
+    "prettier": "^3.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.6.0",
+    "tailwind-merge": "^3.3.0",
+    "tw-animate-css": "^1.2.9"
+  },
+  "devDependencies": {
+    "@rspack/cli": "^1.3.10",
+    "@rspack/core": "^1.3.10",
+    "@rspack/dev-server": "^1.1.1",
+    "@rspack/plugin-react-refresh": "^1.4.3",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@types/dotenv-webpack": "^7.0.8",
+    "@types/node": "^22.15.17",
+    "@types/react": "^19.1.3",
+    "@types/react-dom": "^19.1.3",
+    "dotenv-webpack": "^8.1.0",
+    "javascript-obfuscator": "^4.1.1",
+    "postcss": "^8.5.3",
+    "postcss-loader": "^8.1.1",
+    "react-refresh": "^0.17.0",
+    "run-script-webpack-plugin": "^0.2.3",
+    "tailwindcss": "^4.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "webpack-obfuscator": "^3.5.1"
+  }
+}
+</file>
+
+<file path="README.md">
+# ⚛️ R2H Boilerplate
+
+![Node Version](https://img.shields.io/badge/node-22%2B-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
+![Rspack](https://img.shields.io/badge/Bundler-Rspack-red)
+![React 19](https://img.shields.io/badge/React-19.1.0-61dafb)
+
+> A blazing-fast SSR starter powered by **React 19**, **Rspack**, and **Hono** — engineered for modern development with cutting-edge performance, beautiful UI components, and secure production builds.
+
+---
+
+## 💡 Motivation
+
+I built this boilerplate out of a growing need to break free from the limitations imposed by popular frameworks like Next.js and Remix.
+
+While those frameworks offer great DX, their performance often relies heavily on specific deployment architectures (like Vercel for Next.js). This can result in unnecessary complexity, vendor lock-in, and suboptimal flexibility for developers who want full control over their stack.
+
+This boilerplate is my answer to that problem — a lean, fast, and unopinionated SSR setup using:
+
+✅ React with full flexibility,
+
+✅ Rspack for blazing fast builds,
+
+✅ Hono for a lightweight and modern web server,
+
+✅ Manual control over server-side data fetching, hydration, and routing.
+
+No limits. No lock-in. Just raw power and freedom.
+
+---
+
+## 🚀 Tech Stack
+
+| Tool                        | Purpose                                                           |
+|-----------------------------|-------------------------------------------------------------------|
+| **React 19**                | UI Library (Concurrent Features Ready)                            |
+| **Rspack**                  | Ultra-fast Rust-based bundler                                     |
+| **Hono**                    | Lightning-fast web framework for Node                             |
+| **React Router**            | Seamless routing with SSR compatibility                           |
+| **shadcn/ui + Radix UI**    | Accessible, customizable UI components                            |
+| **TailwindCSS 4**           | Utility-first styling with animation                              |
+| **JavaScript Obfuscator**   | Protect source code in production builds                          |
+| **dotenv**                  | Manage environment variables                                      |
+| **TypeScript (strict)**     | Type-safe code for frontend and backend                           |
+| **Better-auth (upcoming)**  | Simple extensibility for OAuth, magic links, or custom strategies |
+| **Prisma ORM (upcoming)**   | Type-safe database access with powerful query capabilities        |
+
+---
+
+## 🌐 Features
+
+- ✅ **Server-Side Rendering (SSR)** with `hono` and `react-dom/server`
+- ⚡ **Rspack HMR & Build Speed** like Vite but for complex apps
+- 🧠 **Custom `useServerQuery` Hook** for pre-hydration data fetching
+- 🔄 **React Router v7 SSR-Ready Routing**
+- 💅 **shadcn Components + Tailwind Merge + AnimateCSS**
+- 🛡️ **Obfuscated JavaScript** in production using `webpack-obfuscator`
+- 🧪 **Full TypeScript Support** with strict mode enabled
+
+---
+
+## 🔐 Authentication Made Easy
+
+With **better-auth**, this boilerplate supports:
+- JWT-based sessions
+- Authenticated route protection
+- Secure cookie/token management
+- Simple extensibility for OAuth, magic links, or custom strategies
+
+---
+
+## 📁 Project Structure
+
+```
+
+.
+├── client/             # React entry and routes
+├── server/             # Hono server logic (SSR handler)
+├── shared/             # Common hooks and contexts (e.g., useServerQuery)
+├── \_module/            # Output for built SSR server (server.js)
+├── public/             # Static assets
+└── rspack.config.ts    # Rspack build and plugin setup
+
+```
+
+---
+
+## 🧠 Intelligent Data Hydration
+
+The `useServerQuery` hook allows components to fetch data **during SSR** and rehydrate seamlessly on the client — no flicker, no double-fetching, and no boilerplate.
+
+---
+
+## 🛡️ Obfuscated & Optimized for Production
+
+With `webpack-obfuscator` and `javascript-obfuscator`, your production code is transformed to resist reverse engineering while maintaining blazing runtime performance.
+
+---
+
+## 🖼️ UI-Ready Out of the Box
+
+Style your app with:
+- **shadcn/ui** component system
+- **Radix UI primitives**
+- **TailwindCSS + tailwind-merge**
+- **Animate.css utility classes** (`tw-animate-css`)
+
+---
+
+## ⚙️ Scripts
+
+| Command       | Description                            |
+|---------------|----------------------------------------|
+| `pnpm dev`    | Build in watch mode with Rspack        |
+| `pnpm build`  | Production build (obfuscation enabled) |
+| `pnpm start`  | Run the built SSR app (Node server)    |
+
+---
+
+## 📦 Dependency Highlights
+
+- **@rspack/core**, **@rspack/cli** – Core bundler setup
+- **@hono/node-server**, **hono** – Fast HTTP server
+- **tailwindcss**, **postcss-loader** – Styling and CSS utilities
+- **webpack-obfuscator**, **javascript-obfuscator** – Code protection
+
+---
+
+## 🧪 Ready for Expansion
+
+Ideal for:
+- Fullstack React apps
+- Headless CMS integrations
+- E-commerce storefronts
+- Admin dashboards
+- SaaS apps
+
+---
+
+## 🪪 License
+
+MIT © Budi Santoso (@bdxygy)
+
+---
+
+> Built with ❤️ using modern tools to deliver fast, beautiful, and secure web experiences.
+
+---
+
+Credit: Budi Santoso
+
+---
+
+Email: main.budisantoso@gmail.com
+
+---
+</file>
+
+<file path="rspack.config.ts">
+import { defineConfig } from "@rspack/cli";
+import { rspack } from "@rspack/core";
+import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
+import { RunScriptWebpackPlugin } from "run-script-webpack-plugin";
+import WebpackObfuscator from "webpack-obfuscator";
+import path from "path";
+
+// Target browsers, see: https://github.com/browserslist/browserslist
+const targets = ["last 2 versions", "> 0.2%", "not dead", "Firefox ESR"];
+const baseOutputPath = path.resolve(import.meta.dirname, "_module");
+
+const clientConfig = (mode: "development" | "production") =>
+  defineConfig({
+    name: "client",
+    mode,
+    entry: {
+      main: "./client/main.tsx",
+    },
+    target: "web",
+    output: {
+      publicPath: "/public/",
+      path: path.resolve(baseOutputPath, "public"),
+      clean: true,
+      filename: "main.js",
+      chunkFilename: mode === "development" ? "[name].js" : "[name][chunkhash].js",
+    },
+    resolve: {
+      extensions: ["...", ".ts", ".tsx", ".jsx"],
+      alias: {
+        $client: path.resolve(import.meta.dirname, "client"),
+        $server: path.resolve(import.meta.dirname, "server"),
+        $shared: path.resolve(import.meta.dirname, "shared"),
+      },
+    },
+    devServer: {
+      devMiddleware: {
+        writeToDisk: true,
+      },
+    },
+    module: {
+      rules: [
+        {
+          test: /\.css$/,
+          use: ["postcss-loader"],
+          type: "css",
+        },
+        {
+          test: /\.svg$/,
+          type: "asset",
+        },
+        {
+          test: /\.(jsx?|tsx?)$/,
+          use: [
+            {
+              loader: "builtin:swc-loader",
+              options: {
+                jsc: {
+                  parser: {
+                    syntax: "typescript",
+                    tsx: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: "automatic",
+                      development: false,
+                      refresh: false,
+                    },
+                  },
+                },
+                env: { targets },
+              },
+            },
+          ],
+        },
+      ],
+    },
+    plugins: [
+      mode !== "development"
+        ? new WebpackObfuscator({
+          compact: true,
+          controlFlowFlattening: false,
+          deadCodeInjection: false,
+          debugProtection: false,
+          debugProtectionInterval: 0,
+          disableConsoleOutput: false,
+          identifierNamesGenerator: "mangled-shuffled",
+          log: true,
+          numbersToExpressions: false,
+          renameGlobals: false,
+          selfDefending: false,
+          simplify: true,
+          splitStrings: false,
+          stringArray: true,
+          stringArrayCallsTransform: false,
+          stringArrayCallsTransformThreshold: 0.5,
+          stringArrayEncoding: [],
+          stringArrayIndexShift: true,
+          stringArrayRotate: true,
+          stringArrayShuffle: true,
+          stringArrayWrappersCount: 1,
+          stringArrayWrappersChainedCalls: true,
+          stringArrayWrappersParametersMaxCount: 2,
+          stringArrayWrappersType: "function",
+          stringArrayThreshold: 0.75,
+          unicodeEscapeSequence: false,
+          renamePropertiesMode: "safe",
+        })
+        : null,
+      mode === "development" ? new ReactRefreshRspackPlugin() : null,
+    ].filter(Boolean),
+    optimization: {
+      splitChunks: {
+        chunks: "all",
+        minSize: 20 * 1024,   // 20 KiB minimum
+        maxSize: 230 * 1024, // 250 KiB
+        hidePathInfo: true
+      },
+      minimizer: [
+        new rspack.SwcJsMinimizerRspackPlugin(),
+        new rspack.LightningCssMinimizerRspackPlugin({
+          minimizerOptions: { targets },
+        }),
+      ],
+    },
+    performance: {
+      maxAssetSize: 300 * 1024, // 20 KiB
+      maxEntrypointSize: 500 * 1024,
+      hints: "warning",
+    },
+    experiments: {
+      css: true,
+    },
+  });
+
+const serverConfig = (mode: "development" | "production") =>
+  defineConfig({
+    name: "server",
+    mode,
+    entry: "./server/index.ts",
+    target: "node",
+    output: {
+      path: path.resolve(baseOutputPath),
+      filename: "server.js",
+      chunkFilename: mode === "development" ? "[name].[chunkhash].js" : "[chunkhash].js",
+      clean: {
+        keep: /public/,
+      },
+    },
+    stats: {
+      warnings: false,
+    },
+    resolve: {
+      extensions: ["...", ".ts", ".tsx", ".jsx"],
+      alias: {
+        $client: path.resolve(import.meta.dirname, "client"),
+        $server: path.resolve(import.meta.dirname, "server"),
+        $shared: path.resolve(import.meta.dirname, "shared"),
+      },
+    },
+    devServer: {
+      hot: true,
+      devMiddleware: {
+        writeToDisk: true,
+      },
+    },
+    module: {
+      rules: [
+        {
+          test: /\.css$/,
+          use: ["postcss-loader"],
+          type: "css",
+        },
+        {
+          test: /\.svg$/,
+          type: "asset",
+        },
+        {
+          test: /\.(jsx?|tsx?)$/,
+          use: [
+            {
+              loader: "builtin:swc-loader",
+              options: {
+                jsc: {
+                  parser: {
+                    syntax: "typescript",
+                    tsx: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: "automatic",
+                      development: false,
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
+    optimization: {
+      minimizer: [
+        new rspack.SwcJsMinimizerRspackPlugin(),
+        new rspack.LightningCssMinimizerRspackPlugin({
+          minimizerOptions: { targets },
+        }),
+      ],
+    },
+    experiments: {
+      css: true,
+    },
+    plugins: [
+      mode === "development" &&
+      new RunScriptWebpackPlugin({
+        name: "server.js",
+        autoRestart: true,
+      }),
+    ].filter(Boolean),
+  });
+
+export default function (_: any, argv: any) {
+  return [clientConfig(argv.mode), serverConfig(argv.mode)];
+}
+</file>
+
+</files>

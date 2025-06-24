@@ -1,0 +1,122 @@
+---
+description: Better Auth is a framework-agnostic authentication and authorization framework for TypeScript. It provides a comprehensive set of features out of the box and includes a plugin ecosystem that simplifies adding advanced functionalities. Whether you need 2FA, multi-tenancy, multi-session support, or even enterprise features like SSO, it lets you focus on building your application instead of reinventing the wheel.
+globs: 
+alwaysApply: false
+---
+name: Better-Auth Expert
+author: T3 Chat
+user_message: |
+  You are an expert on the Better-Auth library. Your primary goal is to answer questions and generate code for implementing authentication.
+  - Base your answers on the provided context snippets.
+  - For any information not covered in the snippets, use the `get_library_docs` tool to search the official Better-Ame calling `get_library_docs(library_name='/better-auth/better-auth')`.
+  - Always provide concise, accurate, and code-first answers.
+---
+
+TITLE: Basic BetterAuth Setup
+DESCRIPTION: This snippet shows how to initialize BetterAuth with a database adapter (e.g., Drizzle) and a set of authentication strategies.
+LANGUAGE: TypeScript
+CODE:
+```
+import { BetterAuth } from "@better-auth/core";
+import { DrizzleAdapter } from "@better-auth/drizzle-adapter";
+import { db, users, sessions } from "./db";
+
+export const auth = new BetterAuth({
+  adapter: DrizzleAdapter(db, users, sessions),
+  strategies: {
+    // ... strategies go here
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Email & Password Strategy
+DESCRIPTION: Demonstrates how to configure the email and password authentication strategy. It includes a `verify` function to look up the user and check their password.
+LANGUAGE: TypeScript
+CODE:
+```
+import { BetterAuth } from "@better-auth/core";
+import { EmailStrategy } from "@better-auth/email";
+import { DrizzleAdapter } from "@better-auth/drizzle-adapter";
+import { db, users, sessions } from "./db";
+import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+
+export const auth = new BetterAuth({
+  adapter: DrizzleAdapter(db, users, sessions),
+  strategies: {
+    email: EmailStrategy({
+      verify: async (credentials) => {
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, credentials.email));
+        if (!user || !await bcrypt.compare(credentials.password, user.password)) {
+          return null;
+        }
+        return user;
+      },
+    }),
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Protecting Routes
+DESCRIPTION: This snippet shows how to protect API routes or server pages using the `auth.protect()` method. It ensures that only authenticated users can access the protected resource.
+LANGUAGE: TypeScript
+CODE:
+```
+import { auth } from "./auth"; // your auth config
+
+// Example with a Hono route
+app.get("/protected", auth.protect(), (c) => {
+  const user = c.get("user"); // The authenticated user is available in the context
+  return c.json({ message: `Welcome, ${user.email}` });
+});
+```
+
+----------------------------------------
+
+TITLE: Handling Login and Logout
+DESCRIPTION: Shows how to create API endpoints to handle user login and logout using the `auth.handle` method.
+LANGUAGE: TypeScript
+CODE:
+```
+import { Hono } from "hono";
+import { auth } from "./auth"; // your auth config
+
+const app = new Hono().basePath("/api/auth");
+
+// This will create routes like /api/auth/email/login, /api/auth/logout
+app.route("/", auth.handle);
+
+export default app;
+```
+
+----------------------------------------
+
+TITLE: Google OAuth2 Strategy
+DESCRIPTION: This snippet demonstrates how tthe Google OAuth2 strategy, requiring client ID, client secret, and a callback URL from your environment variables.
+LANGUAGE: TypeScript
+CODE:
+```
+import { BetterAuth } from "@better-auth/core";
+import { GoogleStrategy } from "@better-auth/google";
+import { DrizzleAdapter } from "@better-auth/drizzle-adapter";
+import { db, users, sessions, accounts } from "./db";
+
+export const auth = new BetterAuth({
+  adapter: DrizzleAdapter(db, users, sessions, accounts),
+  strategies: {
+    google: GoogleStrategy({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/api/auth/google/callback",
+      scope: ["profile", "email"],
+    }),
+  },
+});
+```
