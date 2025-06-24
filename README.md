@@ -43,7 +43,7 @@ No limits. No lock-in. Just raw power and freedom.
 | **dotenv**                  | Manage environment variables                                      |
 | **TypeScript (strict)**     | Type-safe code for frontend and backend                           |
 | **Better-auth (upcoming)**  | Simple extensibility for OAuth, magic links, or custom strategies |
-| **Prisma ORM (upcoming)**   | Type-safe database access with powerful query capabilities        |
+| **Drizzle ORM (upcoming)**   | Type-safe database access with powerful query capabilities        |
 
 ---
 
