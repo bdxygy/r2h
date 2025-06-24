@@ -1,0 +1,152 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+```mdc
+---
+name: Project Conventions and Guidelines
+author: T3 Chat
+user_message: |
+  This document outlines the architectural patterns, development guidelines, strict rules, and code conventions for the R2H boilerplate.
+  Adherence to these conventions ensures consistency, maintainability, and scalability of the codebase.
+---
+
+# Project Conventions and Guidelines
+
+This document serves as a comprehensive guide for developers working within the R2H boilerplate. It details the project's architecture, general development practices, strict rules to ensure code quality and security, and specific code conventions for a consistent codebase.
+
+## 1. Project Architecture Overview
+
+The R2H boilerplate is structured to provide a clear separation of concerns between client-side (React), server-side (Hono), and shared logic.
+
+-   **`client/`**: Contains all client-side React application code.
+    -   `assets/`: Static assets like images and fonts.
+    -   `components/`: Reusable React components.
+        -   `layout/`: Layout-specific components (e.g., `Header`).
+        -   `ui/`: UI primitives leveraging `shadcn/ui` and `Radix UI`.
+    -   `hooks/`: Custom React hooks for shared client-side logic.
+    -   `libs/`: Utility functions and helper libraries.
+    -   `pages/`: React components representing distinct application routes.
+    -   `App.tsx`: Main React application component.
+    -   `main.css`: Global Tailwind CSS stylesheet.
+    -   `router.tsx`: Client-side routing configuration using `react-router`.
+    -   `bootstrap.tsx`: Client-side hydration entry point.
+-   **`server/`**: Contains all server-side Hono application code.
+    -   `routes/`: API route definitions.
+    -   `api.ts`: Main API router.
+    -   `hono.tsx`: Hono server setup, including SSR rendering.
+    -   `index.ts`: Server entry point.
+-   **`shared/`**: Houses code and types that are utilized by both the client and server.
+    -   `server-context.tsx`: Context and hook for SSR data hydration (`useServerQuery`).
+    -   `stream.ts`: Utilities for streaming React server renders.
+-   **`_module/`**: The output directory for the built server and client assets (managed by Rspack). This directory is committed to `.gitignore`.
+-   **`public/`**: Static assets served directly by the server.
+-   **`rspack.config.ts`**: Configuration for Rspack, handling both client and server builds.
+-   **`package.json`**: Project dependencies and scripts.
+-   **`tsconfig.json`**: TypeScript configuration.
+
+## 2. General Guides
+
+### 2.1 Server-Side Rendering (SSR) and Data Fetching
+
+-   **`useServerQuery` Hook**: For components requiring data during SSR, use the `useServerQuery` hook from `$shared/server-context`. This hook enables data fetching on the server, which is then rehydrated on the client, preventing double-fetching and ensuring a smooth user experience.
+    ```typescript
+    import { useServerQuery } from "$shared/server-context";
+
+    export const MyComponent = () => {
+      const { data, isLoading, error } = useServerQuery({
+        id: "unique-query-id",
+        handler: () => fetch("/api/data").then(res => res.json()),
+      });
+      // ... render logic
+    };
+    ```
+-   **API Endpoints**: Server-side data fetching should primarily interact with Hono API endpoints defined in `server/routes/`.
+
+### 2.2 UI Component Development
+
+-   **shadcn/ui & Radix UI**: Leverage `shadcn/ui` components from `client/components/ui/` for accessible and customizable UI elements. These are built on top of `Radix UI` primitives.
+-   **Styling with Tailwind CSS**: All styling should be done using Tailwind CSS utility classes.
+    -   Use `clsx` and `tailwind-merge` (via the `cn` utility from `$client/libs/utils.ts`) for conditionally applying and merging Tailwind classes effectively.
+    ```typescript
+    import { cn } from "$client/libs/utils";
+
+    <div className={cn("text-lg", isActive && "font-bold")}>...</div>
+    ```
+-   **Animations**: Utilize `tw-animate-css` for declarative animations.
+
+### 2.3 Authentication
+
+-   **Better-Auth Integration**: The boilerplate integrates `Better-Auth` for authentication.
+    -   Refer to `.cursor/rules/better-auth.mdc` for core authentication patterns (e.g., `EmailStrategy`, `GoogleStrategy`, `auth.protect()`, `auth.handle`).
+    -   All authentication logic should adhere to the `Better-Auth` patterns for consistency and security.
+
+### 2.4 Bundling and Development
+
+-   **Rspack**: The project uses `Rspack` for fast development and optimized production builds.
+    -   `pnpm dev`: Starts the development server with HMR and file watching.
+    -   `pnpm build`: Creates optimized production builds, including JavaScript obfuscation for the client-side.
+    -   `pnpm start`: Runs the built Node.js server.
+-   **JavaScript Obfuscation**: Production client builds (`pnpm build`) are obfuscated for source code protection. Be mindful that this can make debugging production issues more challenging.
+
+## 3. Strict Rules to Follow
+
+1.  **TypeScript Strictness**: The `tsconfig.json` enforces strict TypeScript rules. All new code must adhere to these rules, ensuring strong type safety across the entire application. Avoid `any` type usage whenever possible.
+2.  **Absolute Imports**: Always use the defined path aliases for imports (`$client/`, `$server/`, `$shared/`). Relative imports (`../`) are discouraged, except within the same immediate directory for smaller components.
+3.  **Error Handling**:
+    -   **Server-Side (Hono)**: Implement robust error handling in API routes. Utilize Hono's context for returning appropriate HTTP status codes and error messages.
+    -   **Client-Side (React)**: Handle data fetching errors within `useServerQuery` and display user-friendly error states. Use React Error Boundaries for unexpected rendering errors.
+4.  **No Direct DOM Manipulation (Client-Side)**: For React components, avoid direct manipulation of the DOM using `document` or `window` where React provides an equivalent (e.g., `useState`, `useEffect`, `useRef`). Hooks like `useDocument` and `useWindow` are provided for safe access to global objects when necessary.
+5.  **Environment Variables**: Manage sensitive information and configuration differences using environment variables (`.env.*` files). Do not hardcode API keys, secrets, or other sensitive data directly in the code.
+6.  **Immutability**: Strive for immutability when working with data structures, especially in React state and Redux (if introduced). This helps in predicting state changes and debugging.
+
+## 4. Code Conventions
+
+### 4.1 Naming Conventions
+
+-   **Files & Directories**: Use `kebab-case` for file and directory names (e.g., `my-component.tsx`, `user-profile/`).
+-   **React Components**: Use `PascalCase` for React component names and their corresponding filenames (e.g., `MyComponent.tsx`).
+-   **Functions & Variables**: Use `camelCase` for JavaScript/TypeScript functions, variables, and properties (e.g., `getUserData`, `isLoggedIn`).
+-   **Constants**: Use `SCREAMING_SNAKE_CASE` for global constants (e.g., `API_BASE_URL`).
+-   **Type & Interface**: Use `PascalCase` with `I` prefix for interfaces (`IUser`) or `T` for types (`TUser`) or simply `PascalCase` (`User`).
+
+### 4.2 Styling
+
+-   **Tailwind CSS**: Exclusively use Tailwind CSS classes for styling. Avoid inline styles and custom CSS files unless absolutely necessary for very specific global overrides or animations not covered by `tw-animate-css`.
+-   **`cn` Utility**: Always use the `cn` utility from `$client/libs/utils.ts` for combining and conditionally applying Tailwind classes.
+
+### 4.3 React Component Structure
+
+-   **Functional Components**: Prefer functional components with React Hooks over class components.
+-   **Lazy Loading**: Use `lazy` and `Suspense` for code-splitting routes and larger components to improve initial load performance (e.g., in `client/router.tsx` and `client/App.tsx`).
+-   **Props**: Destructure props at the top of the component function. Clearly define prop types using TypeScript interfaces.
+-   **JSX**: Use parentheses to wrap multi-line JSX.
+-   **State Management**: Use `useState`, `useReducer`, and `useContext` for local and shared component state.
+
+### 4.4 Imports
+
+-   **Ordering**: Maintain a consistent import order:
+    1.  Node.js built-in modules
+    2.  Third-party libraries (e.g., `react`, `hono`, `axios`)
+    3.  Absolute imports using aliases (`$client/`, `$server/`, `$shared/`)
+    4.  Relative imports (within the same directory or immediate sub-directories)
+    5.  CSS imports (at the very top or bottom of the file).
+-   **Named Imports**: Prefer named imports over default imports unless the module explicitly exports a single default.
+
+### 4.5 Asynchronous Code
+
+-   **`async/await`**: Use `async/await` for handling asynchronous operations. Avoid using `.then().catch()` chains unless specifically integrating with Promise-based APIs that require it.
+
+### 4.6 Type Definitions
+
+-   **Clear Types**: Define types and interfaces clearly for all data structures, function parameters, and return values. This is crucial for maintaining a type-safe codebase.
+-   **Colocation**: Colocate types with the components or modules they define (e.g., `interface Props {}` within the component file). For shared types, define them in `$shared/` or a dedicated `types/` directory if needed.
+
+### 4.7 General Formatting
+
+-   **Prettier**: The project should use Prettier for code formatting. Ensure your IDE is configured to format files on save using Prettier.
+-   **Line Length**: Aim for a maximum line length of 80-100 characters for readability.
+
+By adhering to these guidelines, we can ensure a consistent, maintainable, and high-quality codebase for the R2H boilerplate.
+```
