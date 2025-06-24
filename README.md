@@ -31,19 +31,19 @@ No limits. No lock-in. Just raw power and freedom.
 
 ## 🚀 Tech Stack
 
-| Tool                        | Purpose                                                           |
-|-----------------------------|-------------------------------------------------------------------|
-| **React 19**                | UI Library (Concurrent Features Ready)                            |
-| **Rspack**                  | Ultra-fast Rust-based bundler                                     |
-| **Hono**                    | Lightning-fast web framework for Node                             |
-| **React Router**            | Seamless routing with SSR compatibility                           |
-| **shadcn/ui + Radix UI**    | Accessible, customizable UI components                            |
-| **TailwindCSS 4**           | Utility-first styling with animation                              |
-| **JavaScript Obfuscator**   | Protect source code in production builds                          |
-| **dotenv**                  | Manage environment variables                                      |
-| **TypeScript (strict)**     | Type-safe code for frontend and backend                           |
-| **Better-auth (upcoming)**  | Simple extensibility for OAuth, magic links, or custom strategies |
-| **Drizzle ORM (upcoming)**   | Type-safe database access with powerful query capabilities        |
+| Tool                       | Purpose                                                           |
+| -------------------------- | ----------------------------------------------------------------- |
+| **React 19**               | UI Library (Concurrent Features Ready)                            |
+| **Rspack**                 | Ultra-fast Rust-based bundler                                     |
+| **Hono**                   | Lightning-fast web framework for Node                             |
+| **React Router**           | Seamless routing with SSR compatibility                           |
+| **shadcn/ui + Radix UI**   | Accessible, customizable UI components                            |
+| **TailwindCSS 4**          | Utility-first styling with animation                              |
+| **JavaScript Obfuscator**  | Protect source code in production builds                          |
+| **dotenv**                 | Manage environment variables                                      |
+| **TypeScript (strict)**    | Type-safe code for frontend and backend                           |
+| **Better-auth (upcoming)** | Simple extensibility for OAuth, magic links, or custom strategies |
+| **Drizzle ORM (upcoming)** | Type-safe database access with powerful query capabilities        |
 
 ---
 
@@ -61,11 +61,35 @@ No limits. No lock-in. Just raw power and freedom.
 
 ## 🔐 Authentication Made Easy
 
-With **better-auth**, this boilerplate supports:
+With **better-auth** and **Drizzle ORM**, this boilerplate supports:
+
 - JWT-based sessions
 - Authenticated route protection
 - Secure cookie/token management
 - Simple extensibility for OAuth, magic links, or custom strategies
+- **Drizzle ORM** as the database adapter (PostgreSQL)
+
+### Environment Variables
+
+Add the following to your `.env`:
+
+```
+BETTER_AUTH_SECRET=your-random-secret
+BETTER_AUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID= # (optional, for Google login)
+GOOGLE_CLIENT_SECRET= # (optional, for Google login)
+```
+
+### API Endpoints
+
+- All authentication endpoints are available at `/api/auth/*`.
+- Protect server routes using Better Auth's session check:
+  ```ts
+  import { auth } from "$server/lib/auth";
+  // In a Hono route handler:
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) return c.text("Unauthorized", 401);
+  ```
 
 ---
 
@@ -73,84 +97,4 @@ With **better-auth**, this boilerplate supports:
 
 ```
 
-.
-├── client/             # React entry and routes
-├── server/             # Hono server logic (SSR handler)
-├── shared/             # Common hooks and contexts (e.g., useServerQuery)
-├── \_module/            # Output for built SSR server (server.js)
-├── public/             # Static assets
-└── rspack.config.ts    # Rspack build and plugin setup
-
 ```
-
----
-
-## 🧠 Intelligent Data Hydration
-
-The `useServerQuery` hook allows components to fetch data **during SSR** and rehydrate seamlessly on the client — no flicker, no double-fetching, and no boilerplate.
-
----
-
-## 🛡️ Obfuscated & Optimized for Production
-
-With `webpack-obfuscator` and `javascript-obfuscator`, your production code is transformed to resist reverse engineering while maintaining blazing runtime performance.
-
----
-
-## 🖼️ UI-Ready Out of the Box
-
-Style your app with:
-- **shadcn/ui** component system
-- **Radix UI primitives**
-- **TailwindCSS + tailwind-merge**
-- **Animate.css utility classes** (`tw-animate-css`)
-
----
-
-## ⚙️ Scripts
-
-| Command       | Description                            |
-|---------------|----------------------------------------|
-| `pnpm dev`    | Build in watch mode with Rspack        |
-| `pnpm build`  | Production build (obfuscation enabled) |
-| `pnpm start`  | Run the built SSR app (Node server)    |
-
----
-
-## 📦 Dependency Highlights
-
-- **@rspack/core**, **@rspack/cli** – Core bundler setup
-- **@hono/node-server**, **hono** – Fast HTTP server
-- **tailwindcss**, **postcss-loader** – Styling and CSS utilities
-- **webpack-obfuscator**, **javascript-obfuscator** – Code protection
-
----
-
-## 🧪 Ready for Expansion
-
-Ideal for:
-- Fullstack React apps
-- Headless CMS integrations
-- E-commerce storefronts
-- Admin dashboards
-- SaaS apps
-
----
-
-## 🪪 License
-
-MIT © Budi Santoso (@bdxygy)
-
----
-
-> Built with ❤️ using modern tools to deliver fast, beautiful, and secure web experiences.
-
----
-
-Credit: Budi Santoso
-
----
-
-Email: main.budisantoso@gmail.com
-
----

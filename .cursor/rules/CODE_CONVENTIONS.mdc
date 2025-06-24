@@ -90,6 +90,36 @@ The R2H boilerplate is structured to provide a clear separation of concerns betw
     -   `pnpm start`: Runs the built Node.js server.
 -   **JavaScript Obfuscation**: Production client builds (`pnpm build`) are obfuscated for source code protection. Be mindful that this can make debugging production issues more challenging.
 
+## Authentication & Authorization (Better Auth + Drizzle ORM)
+
+- Use `better-auth` for all authentication and session management.
+- Use `drizzleAdapter` from `@better-auth/drizzle-adapter` with the Drizzle ORM instance for Postgres:
+  ```ts
+  import { betterAuth } from "better-auth";
+  import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+  import { db } from "$server/lib/db";
+  export const auth = betterAuth({
+    database: drizzleAdapter(db, { provider: "pg" }),
+    emailAndPassword: { enabled: true },
+  });
+  ```
+- Expose all auth endpoints at `/api/auth/*` using a Hono route:
+  ```ts
+  import { auth } from "$server/lib/auth";
+  const authRoute = new Hono();
+  authRoute.all("/api/auth/*", async (c) => auth.handler(c.req.raw));
+  export default authRoute;
+  ```
+- Protect server routes by checking session:
+  ```ts
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) return c.text("Unauthorized", 401);
+  ```
+- Required environment variables:
+  - `BETTER_AUTH_SECRET`
+  - `BETTER_AUTH_URL`
+  - (Optional) `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+
 ## 3. Strict Rules to Follow
 
 1.  **TypeScript Strictness**: The `tsconfig.json` enforces strict TypeScript rules. All new code must adhere to these rules, ensuring strong type safety across the entire application. Avoid `any` type usage whenever possible.
@@ -100,6 +130,7 @@ The R2H boilerplate is structured to provide a clear separation of concerns betw
 4.  **No Direct DOM Manipulation (Client-Side)**: For React components, avoid direct manipulation of the DOM using `document` or `window` where React provides an equivalent (e.g., `useState`, `useEffect`, `useRef`). Hooks like `useDocument` and `useWindow` are provided for safe access to global objects when necessary.
 5.  **Environment Variables**: Manage sensitive information and configuration differences using environment variables (`.env.*` files). Do not hardcode API keys, secrets, or other sensitive data directly in the code.
 6.  **Immutability**: Strive for immutability when working with data structures, especially in React state and Redux (if introduced). This helps in predicting state changes and debugging.
+7. Always use bun or pnpm as package manager. (Perfer BUN MOSTLY).
 
 ## 4. Code Conventions
 
