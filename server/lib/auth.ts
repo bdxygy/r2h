@@ -70,24 +70,3 @@ export const auth = betterAuth({
     autoSignIn: true,
   },
 });
-
-const authHook = createAuthMiddleware(async (ctx) => {
-  ctx.setCookie("r2h-session", "value");
-  await ctx.setSignedCookie("r2h-session", "value", ctx.context.secret, {
-    maxAge: 1000,
-  });
-
-  const cookie = ctx.getCookie("r2h-session");
-  const signedCookie = await ctx.getSignedCookie(
-    "r2h-session",
-    ctx.context.secret
-  );
-
-  if (!signedCookie) {
-    throw new APIError("BAD_REQUEST", {
-      message: "Invalid request",
-    });
-  }
-
-  return ctx.redirect("");
-});
