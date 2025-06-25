@@ -1,10 +1,11 @@
 import axios from "axios";
 
 import { useServerQuery } from "$shared/server-context";
-import { authClient } from "$client/libs/auth";
+import { authClient } from "$client/libs/auth-client";
 import { Button } from "$client/components/ui/button";
 
-export const About = () => {
+export const About = async () => {
+  const { data: session } = await authClient.getSession();
   const { data, isLoading, error } = useServerQuery({
     id: "About",
     handler: () =>
@@ -17,13 +18,12 @@ export const About = () => {
 
   if (error) return <div>{JSON.stringify(error)}</div>;
 
-  const { data: session } = authClient.useSession();
-
   return (
     <div>
       <Button
-        onClick={async () =>
-          await authClient.signIn.email({
+        className="mb-4 hover:cursor-pointer"
+        onClick={() =>
+          authClient.signIn.email({
             email: "test@test.com",
             password: "123456",
           })
