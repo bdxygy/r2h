@@ -1,11 +1,10 @@
-import { APIError, betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "$server/lib/db";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { validator } from "validation-better-auth";
 import { z } from "zod";
 
-import { createAuthMiddleware } from "better-auth/api";
 import { account, session, user, verification } from "./schema";
 
 export const auth = betterAuth({
