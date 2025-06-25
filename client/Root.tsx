@@ -3,7 +3,7 @@ import { lazy } from "react";
 import Logo from "./assets/react.svg";
 import "./Root.css";
 
-const App = lazy(() => import("./app"));
+const App = lazy(() => import("./App"));
 
 function Root() {
   return (

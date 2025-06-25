@@ -8,6 +8,13 @@
       "when": 1750760690340,
       "tag": "0000_busy_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1750765623251,
+      "tag": "0001_fast_bill_hollister",
+      "breakpoints": true
     }
   ]
 }

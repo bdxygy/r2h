@@ -11,7 +11,7 @@ import { ServerContextI, ServerQueryProvider } from "$shared/server-context";
 
 import api from "./api";
 
-const Root = lazy(() => import("$client/root"));
+const Root = lazy(() => import("$client/Root"));
 
 const errorHtml =
   "<!DOCTYPE html><html><body><h1>Something went wrong</h1></body></html>";
@@ -34,7 +34,10 @@ app.get("/favicon.ico", (c) => c.body(null, 204));
 
 app.get("/*", async (c) => {
   const nonce = crypto.randomUUID();
-  c.res.headers.set("Content-Security-Policy", `script-src 'self' 'nonce-${nonce}'`);
+  c.res.headers.set(
+    "Content-Security-Policy",
+    `script-src 'self' 'nonce-${nonce}'`
+  );
 
   try {
     let didError = false;
@@ -94,11 +97,9 @@ app.get("/*", async (c) => {
     }
 
     return streamToResponse(stream);
-
   } catch (error) {
     console.error(error);
     return c.html(errorHtml, 500);
-
   }
 });
 

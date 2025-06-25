@@ -1,9 +1,57 @@
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "$server/lib/db";
+import { openAPI } from "better-auth/plugins";
+import { validator } from "validation-better-auth";
+import { z } from "zod";
+
+import { createAuthMiddleware } from "better-auth/api";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
+  plugins: [
+    openAPI(),
+    validator([
+      {
+        path: "/sign-up/email",
+        schema: z.object({
+          email: z.string().email(),
+          password: z.string().min(8),
+        }),
+        before: (ctx) => {
+          console.log(ctx);
+        },
+        after: (ctx) => {
+          console.log(ctx);
+        },
+      },
+      {
+        path: "/sign-in/email",
+        schema: z.object({
+          email: z.string().email(),
+          password: z.string().min(8),
+        }),
+        before: (ctx) => {
+          console.log(ctx);
+        },
+        after: (ctx) => {
+          console.log(ctx);
+        },
+      },
+    ]),
+  ],
+  rateLimit: {
+    enabled: true,
+    max: 10,
+    ttl: 60 * 1000,
+  },
+  baseURL: "http://localhost:32300",
+  advanced: {
+    useSecureCookies: true,
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Set to true if you want email verification
@@ -11,4 +59,25 @@ export const auth = betterAuth({
     maxPasswordLength: 128,
     autoSignIn: true,
   },
+});
+
+const authHook = createAuthMiddleware(async (ctx) => {
+  ctx.setCookie("r2h-session", "value");
+  await ctx.setSignedCookie("r2h-session", "value", ctx.context.secret, {
+    maxAge: 1000,
+  });
+
+  const cookie = ctx.getCookie("r2h-session");
+  const signedCookie = await ctx.getSignedCookie(
+    "r2h-session",
+    ctx.context.secret
+  );
+
+  if (!signedCookie) {
+    throw new APIError("BAD_REQUEST", {
+      message: "Invalid request",
+    });
+  }
+
+  return ctx.redirect("");
 });
