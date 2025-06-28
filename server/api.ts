@@ -1,18 +1,9 @@
-import { type } from "arktype";
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { describeRoute } from "hono-openapi";
-import { validator as arkValidator, resolver } from "hono-openapi/arktype";
+import { describeRoute, openAPISpecs } from "hono-openapi";
 import authRoutes from "./routes/auth";
 
 const api = new Hono();
-
-const responseSchema = type({
-  name: "string",
-});
-
-const querySchema = type({
-  name: "string",
-});
 
 api.get(
   "/",
@@ -22,20 +13,41 @@ api.get(
     responses: {
       200: {
         description: "Successful response",
-        content: {
-          "application/json": {
-            schema: resolver(responseSchema),
-          },
-        },
       },
     },
     validateResponse: true,
   }),
-  arkValidator("query", querySchema),
-  async (c) => {
-    const { name } = c.req.valid("query");
-    return c.json({ name });
+  (c) => {
+    return c.json({ name: "Hello world" }, 200);
   },
+);
+
+api.get(
+  "/openapi",
+  openAPISpecs(api, {
+    documentation: {
+      info: {
+        title: "Hono",
+        version: "1.0.0",
+        description: "API for greeting users",
+      },
+      servers: [
+        {
+          url: "http://localhost:32300/api",
+          description: "Local server",
+        },
+      ],
+    },
+  }),
+);
+
+api.get(
+  "/docs",
+  Scalar({
+    theme: "solarized",
+    url: "/api/openapi",
+    baseServerURL: "http://localhost:32300/api/",
+  }),
 );
 
 api.route("/", authRoutes);
