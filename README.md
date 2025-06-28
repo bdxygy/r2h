@@ -42,8 +42,8 @@ No limits. No lock-in. Just raw power and freedom.
 | **JavaScript Obfuscator**  | Protect source code in production builds                          |
 | **dotenv**                 | Manage environment variables                                      |
 | **TypeScript (strict)**    | Type-safe code for frontend and backend                           |
-| **Better-auth (upcoming)** | Simple extensibility for OAuth, magic links, or custom strategies |
-| **Drizzle ORM (upcoming)** | Type-safe database access with powerful query capabilities        |
+| **Better-auth**            | Simple extensibility for OAuth, magic links, or custom strategies |
+| **Drizzle ORM**            | Type-safe database access with powerful query capabilities        |
 
 ---
 
@@ -56,6 +56,7 @@ No limits. No lock-in. Just raw power and freedom.
 - 💅 **shadcn Components + Tailwind Merge + AnimateCSS**
 - 🛡️ **Obfuscated JavaScript** in production using `webpack-obfuscator`
 - 🧪 **Full TypeScript Support** with strict mode enabled
+- 📦 **Hono OpenAPI** for API documentation and testing
 
 ---
 
@@ -96,5 +97,20 @@ GOOGLE_CLIENT_SECRET= # (optional, for Google login)
 ## 📁 Project Structure
 
 ```
-
+├── server/
+│   ├── api.ts
+│   ├── routes/
+│   ├── lib/
+│   ├── hono.tsx
+│   └── ...
+├── shared/
+│   ├── components/
+│   ├── utils/
+│   └── ...
+├── public/
+│   ├── ...
+│   └── ...
+├── .env
+│   └── ...
+├── ...
 ```
