@@ -1,0 +1,32 @@
+# Add patterns to ignore here, one per line
+# Example:
+# *.log
+# tmp/
+.clinerules/
+.github/
+.roo/
+.taskmaster/
+.trae/
+.windsurf/
+drizzle/
+.cursor/
+.env.client.development
+.env.client.production
+.env.server.development
+.env.server.production
+.env
+.gitignore
+.repomixignore
+.repomix.config.json
+.roomodes
+.taskmaster.config.json
+node_modules/
+_module/
+.vscode/
+AGENTS.md
+repomix-output.xml
+pnpm-lock.yaml
+bun.lockb
+bun.lock
+CLAUDE.md
+*.svg
