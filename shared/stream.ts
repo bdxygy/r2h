@@ -1,7 +1,7 @@
-import { JSX } from "react";
+import { Readable } from "node:stream";
+import type { JSX } from "react";
 import { renderToPipeableStream } from "react-dom/server";
-import { Readable } from "stream";
-import { ServerContextI } from "./server-context";
+import type { ServerContextI } from "./server-context";
 
 // Helper function to convert Node.js stream to Response using PassThrough
 export const streamToResponse = (stream: Readable): Response => {
@@ -11,13 +11,13 @@ export const streamToResponse = (stream: Readable): Response => {
       headers: {
         "content-type": "text/html",
       },
-    }
+    },
   );
 };
 
 export const getDataMapFromPipeStream = (
   component: JSX.Element,
-  serverContext: ServerContextI
+  serverContext: ServerContextI,
 ): Promise<ServerContextI> => {
   return new Promise((resolve, reject) => {
     renderToPipeableStream(component, {

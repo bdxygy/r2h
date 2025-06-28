@@ -23,12 +23,10 @@ authRoutes.use("*", async (c, next) => {
   return next();
 });
 
-authRoutes.on(["GET", "POST"], "/api/auth/**", async (c) =>
-  auth.handler(c.req.raw)
-);
+authRoutes.on(["GET", "POST"], "/auth/*", async (c) => auth.handler(c.req.raw));
 
 authRoutes.use(
-  "/api/auth/**", // or replace with "*" to enable cors for all routes
+  "/auth/**",
   cors({
     origin: "http://localhost:32300", // replace with your origin
     allowHeaders: ["Content-Type", "Authorization", "Cookie", "Set-Cookie"],
@@ -36,7 +34,7 @@ authRoutes.use(
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
     credentials: true,
-  })
+  }),
 );
 
 export default authRoutes;

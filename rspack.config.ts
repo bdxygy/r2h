@@ -1,9 +1,9 @@
+import path from "node:path";
 import { defineConfig } from "@rspack/cli";
 import { rspack } from "@rspack/core";
 import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
 import { RunScriptWebpackPlugin } from "run-script-webpack-plugin";
 import WebpackObfuscator from "webpack-obfuscator";
-import path from "path";
 
 // Target browsers, see: https://github.com/browserslist/browserslist
 const targets = ["last 2 versions", "> 0.2%", "not dead", "Firefox ESR"];

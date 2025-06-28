@@ -1,23 +1,43 @@
+import { type } from "arktype";
 import { Hono } from "hono";
+import { describeRoute } from "hono-openapi";
+import { validator as arkValidator, resolver } from "hono-openapi/arktype";
 import authRoutes from "./routes/auth";
-import { getSignedCookie } from "hono/cookie";
 
-const api = new Hono({
-  strict: true,
+const api = new Hono();
+
+const responseSchema = type({
+  name: "string",
 });
 
-api.get("/", async (c) => {
-  const cookie = c.req.header("cookie");
-
-  console.log({ cookie });
-
-  const foo = await getSignedCookie(c, Buffer.from("secret", "utf-8"), "foo");
-
-  if (foo) return c.text(`Hello ${foo}`);
-
-  return c.text("Hello world!");
+const querySchema = type({
+  name: "string",
 });
 
-api.route("auth", authRoutes);
+api.get(
+  "/",
+  describeRoute({
+    description: "Hello world",
+    tags: ["hello"],
+    responses: {
+      200: {
+        description: "Successful response",
+        content: {
+          "application/json": {
+            schema: resolver(responseSchema),
+          },
+        },
+      },
+    },
+    validateResponse: true,
+  }),
+  arkValidator("query", querySchema),
+  async (c) => {
+    const { name } = c.req.valid("query");
+    return c.json({ name });
+  },
+);
+
+api.route("/", authRoutes);
 
 export default api;

@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 export interface ServerContextI {
   isServer: boolean;
-  handlers: Promise<any>[];
-  dataMap: Record<string, any>;
+  handlers: Promise<unknown>[];
+  dataMap: Record<string, unknown>;
 }
 
 const ServerContext = createContext<ServerContextI>({} as ServerContextI);
@@ -22,19 +22,19 @@ export const ServerQueryProvider = ({
 
 export interface ServerQueryProps {
   id: string;
-  handler: () => Promise<any>;
+  handler: () => Promise<unknown>;
 }
 
 export const useServerQuery = ({ id, handler }: ServerQueryProps) => {
   const context = useContext(ServerContext);
 
-  const [data, setData] = useState<any>(() => {
+  const [data, setData] = useState<unknown | null>(() => {
     return context.dataMap[id] ?? null;
   });
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<unknown | null>(null);
 
   const fetchPromise = () =>
     handler()
@@ -52,6 +52,7 @@ export const useServerQuery = ({ id, handler }: ServerQueryProps) => {
     fetchPromise().finally(() => setIsLoading(false));
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: "I don't want to use exhaustive dependencies"
   useEffect(() => {
     if (context.isServer || typeof window === "undefined") return;
 

@@ -1,13 +1,15 @@
+import {
+  type ServerContextI,
+  ServerQueryProvider,
+} from "$shared/server-context";
+import { getDataMapFromPipeStream, streamToResponse } from "$shared/stream";
+import { PassThrough } from "node:stream";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { compress } from "hono/compress";
-import { serveStatic } from "@hono/node-server/serve-static";
+import { lazy } from "react";
 import { renderToPipeableStream } from "react-dom/server";
 import { StaticRouter } from "react-router";
-import { lazy } from "react";
-import { PassThrough } from "stream";
-
-import { getDataMapFromPipeStream, streamToResponse } from "$shared/stream";
-import { ServerContextI, ServerQueryProvider } from "$shared/server-context";
 
 import api from "./api";
 
@@ -23,7 +25,7 @@ const app = new Hono({
 app.use(
   compress({
     encoding: "gzip",
-  })
+  }),
 );
 
 app.use("/public/*", serveStatic({ root: "./_module" }));
@@ -36,7 +38,7 @@ app.get("/*", async (c) => {
   const nonce = crypto.randomUUID();
   c.res.headers.set(
     "Content-Security-Policy",
-    `script-src 'self' 'nonce-${nonce}'`
+    `script-src 'self' 'nonce-${nonce}'`,
   );
 
   try {
@@ -59,7 +61,7 @@ app.get("/*", async (c) => {
 
     const newServerContext = await getDataMapFromPipeStream(
       componentFn(serverContext),
-      serverContext
+      serverContext,
     );
 
     const { pipe, abort } = renderToPipeableStream(
@@ -85,7 +87,7 @@ app.get("/*", async (c) => {
           didError = true;
           console.error(err);
         },
-      }
+      },
     );
 
     c.req.raw.signal.addEventListener("abort", () => {
