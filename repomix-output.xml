@@ -1,0 +1,767 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+The content has been processed where comments have been removed, empty lines have been removed, content has been compressed (code blocks are separated by ⋮---- delimiter).
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Code comments have been removed from supported file types
+- Empty lines have been removed from all files
+- Content has been compressed - code blocks are separated by ⋮---- delimiter
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+client/
+  components/
+    layout/
+      header.tsx
+    ui/
+      accordion.tsx
+      button.tsx
+      dialog.tsx
+      sheet.tsx
+  hooks/
+    use-document.ts
+    use-window.ts
+  libs/
+    auth-client.ts
+    utils.ts
+  pages/
+    about.tsx
+    home.tsx
+  App.tsx
+  bootstrap.tsx
+  main.css
+  main.tsx
+  react-env.d.ts
+  Root.tsx
+  router.tsx
+server/
+  lib/
+    auth.ts
+    db.ts
+    schema.ts
+  routes/
+    auth.ts
+  api.ts
+  hono.tsx
+  index.ts
+shared/
+  server-context.tsx
+  stream.ts
+.env.example
+biome.json
+components.json
+docker-compose.yml
+drizzle.config.ts
+package.json
+pnpm-workspace.yaml
+postcss.config.mjs
+README.md
+repomix.config.json
+rspack.config.ts
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="client/pages/home.tsx">
+import axios from "axios";
+import { useServerQuery } from "$shared/server-context";
+</file>
+
+<file path="repomix.config.json">
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "input": {
+    "maxFileSize": 52428800
+  },
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "parsableStyle": false,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "files": true,
+    "removeComments": true,
+    "removeEmptyLines": true,
+    "compress": true,
+    "topFilesLength": 5,
+    "showLineNumbers": false,
+    "copyToClipboard": false,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100,
+      "includeDiffs": false
+    }
+  },
+  "include": [],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": []
+  },
+  "security": {
+    "enableSecurityCheck": true
+  },
+  "tokenCount": {
+    "encoding": "o200k_base"
+  }
+}
+</file>
+
+<file path="client/hooks/use-window.ts">
+import { useState, useEffect } from "react";
+export const useWindow = () =>
+</file>
+
+<file path="client/libs/auth-client.ts">
+import { createAuthClient } from "better-auth/client";
+import type { auth } from "$server/lib/auth.ts";
+import { inferAdditionalFields } from "better-auth/client/plugins";
+</file>
+
+<file path="biome.json">
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["client/**", "server/**", "shared/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}
+</file>
+
+<file path="drizzle.config.ts">
+import { defineConfig } from "drizzle-kit";
+</file>
+
+<file path="pnpm-workspace.yaml">
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - javascript-obfuscator
+</file>
+
+<file path="postcss.config.mjs">
+
+</file>
+
+<file path="client/components/ui/accordion.tsx">
+import { ChevronDownIcon } from "lucide-react";
+import { cn } from "$client/libs/utils";
+function Accordion({
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Root>)
+⋮----
+function AccordionTrigger({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger>)
+⋮----
+className=
+⋮----
+function AccordionContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Content>)
+</file>
+
+<file path="client/components/ui/button.tsx">
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "$client/libs/utils";
+</file>
+
+<file path="client/components/ui/dialog.tsx">
+import { XIcon } from "lucide-react";
+import { cn } from "$client/libs/utils";
+function Dialog({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>)
+function DialogTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>)
+function DialogPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>)
+function DialogClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>)
+⋮----
+function DialogContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content>)
+⋮----
+className=
+</file>
+
+<file path="client/components/ui/sheet.tsx">
+import { XIcon } from "lucide-react";
+import { cn } from "$client/libs/utils";
+function Sheet(
+function SheetTrigger({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Trigger>)
+function SheetClose({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Close>)
+function SheetPortal({
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Portal>)
+⋮----
+function SheetContent({
+  className,
+  children,
+  side = "right",
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+  side?: "top" | "right" | "bottom" | "left";
+})
+⋮----
+className=
+</file>
+
+<file path="client/hooks/use-document.ts">
+import { useState, useEffect } from "react";
+export const useDocument = () =>
+</file>
+
+<file path="client/libs/utils.ts">
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+export function cn(...inputs: ClassValue[])
+</file>
+
+<file path="client/main.css">
+:root {
+.dark {
+@theme inline {
+@layer base {
+⋮----
+* {
+body {
+</file>
+
+<file path="client/main.tsx">
+
+</file>
+
+<file path="client/react-env.d.ts">
+type CSSModuleClasses = { readonly [key: string]: string };
+</file>
+
+<file path="client/router.tsx">
+import { lazy } from "react";
+import { Routes, Route } from "react-router";
+⋮----
+const Router = () => (
+  <Routes>
+    <Route path="/" Component={Home} />
+    <Route path="/about" Component={About} />
+  </Routes>
+);
+</file>
+
+<file path="server/lib/db.ts">
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+</file>
+
+<file path="server/index.ts">
+import { serve } from "@hono/node-server";
+</file>
+
+<file path=".env.example">
+# API Keys (Required to enable respective provider)
+ANTHROPIC_API_KEY="your_anthropic_api_key_here"       # Required: Format: sk-ant-api03-...
+PERPLEXITY_API_KEY="your_perplexity_api_key_here"     # Optional: Format: pplx-...
+OPENAI_API_KEY="your_openai_api_key_here"             # Optional, for OpenAI/OpenRouter models. Format: sk-proj-...
+GOOGLE_API_KEY="your_google_api_key_here"             # Optional, for Google Gemini models.
+MISTRAL_API_KEY="your_mistral_key_here"               # Optional, for Mistral AI models.
+XAI_API_KEY="YOUR_XAI_KEY_HERE"                       # Optional, for xAI AI models.
+AZURE_OPENAI_API_KEY="your_azure_key_here"            # Optional, for Azure OpenAI models (requires endpoint in .taskmaster/config.json).
+OLLAMA_API_KEY="your_ollama_api_key_here"             # Optional: For remote Ollama servers that require authentication.
+GITHUB_API_KEY="your_github_api_key_here"             # Optional: For GitHub import/export features. Format: ghp_... or github_pat_...
+
+DATABASE_URL="postgresql:"
+</file>
+
+<file path="components.json">
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "client/main.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "$client/components",
+    "utils": "$client/libs/utils",
+    "ui": "$client/components/ui",
+    "lib": "$client/libs",
+    "hooks": "$client/hooks"
+  },
+  "iconLibrary": "lucide"
+}
+</file>
+
+<file path="docker-compose.yml">
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: r2huser
+      POSTGRES_PASSWORD: r2hpass
+      POSTGRES_DB: r2hdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["DOM", "ES2020"],
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": false,
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "$client/*": ["client/*"],
+      "$server/*": ["server/*"],
+      "$shared/*": ["shared/*"]
+    }
+  },
+  "include": ["client", "server", "shared"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext"
+    }
+  }
+}
+</file>
+
+<file path="client/components/layout/header.tsx">
+import { Menu } from "lucide-react";
+import { lazy } from "react";
+⋮----
+export default function Header()
+</file>
+
+<file path="client/App.tsx">
+import { lazy } from "react";
+⋮----
+function App()
+</file>
+
+<file path="server/lib/schema.ts">
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+</file>
+
+<file path="shared/server-context.tsx">
+import { createContext, useContext, useEffect, useState } from "react";
+export interface ServerContextI {
+  isServer: boolean;
+  handlers: Promise<unknown>[];
+  dataMap: Record<string, unknown>;
+}
+⋮----
+export const ServerQueryProvider = ({
+  value,
+  children,
+}: {
+  value: ServerContextI;
+  children: React.ReactNode;
+}) =>
+export interface ServerQueryProps {
+  id: string;
+  handler: () => Promise<unknown>;
+}
+export const useServerQuery = (
+⋮----
+const fetchPromise = ()
+const fetchClient = () =>
+</file>
+
+<file path="client/bootstrap.tsx">
+import {
+  type ServerContextI,
+  ServerQueryProvider,
+} from "$shared/server-context";
+import { lazy, StrictMode } from "react";
+⋮----
+interface Window {
+    __SERVER_QUERY__: Record<string, unknown>;
+  }
+⋮----
+export const main = () =>
+</file>
+
+<file path="server/routes/auth.ts">
+import { auth } from "$server/lib/auth";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+</file>
+
+<file path="shared/stream.ts">
+import { Readable } from "node:stream";
+import type { JSX } from "react";
+import { renderToPipeableStream } from "react-dom/server";
+import type { ServerContextI } from "./server-context";
+export const streamToResponse = (stream: Readable): Response =>
+export const getDataMapFromPipeStream = (
+  component: JSX.Element,
+  serverContext: ServerContextI,
+): Promise<ServerContextI> =>
+⋮----
+onShellError(err)
+onError(err)
+</file>
+
+<file path="client/Root.tsx">
+import { lazy } from "react";
+import Logo from "./assets/react.svg";
+⋮----
+function Root()
+</file>
+
+<file path="server/lib/auth.ts">
+import { db } from "$server/lib/db";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI } from "better-auth/plugins";
+import { validator } from "validation-better-auth";
+import { z } from "zod";
+import { account, session, user, verification } from "./schema";
+</file>
+
+<file path="server/api.ts">
+import { Scalar } from "@scalar/hono-api-reference";
+import { Hono } from "hono";
+import { describeRoute, openAPISpecs } from "hono-openapi";
+import authRoutes from "./routes/auth";
+</file>
+
+<file path="client/pages/about.tsx">
+import axios from "axios";
+import { useServerQuery } from "$shared/server-context";
+import { authClient } from "$client/libs/auth-client";
+import { Button } from "$client/components/ui/button";
+⋮----
+const handleSignUp = async () =>
+const handleSignIn = async () =>
+</file>
+
+<file path="server/hono.tsx">
+import {
+  type ServerContextI,
+  ServerQueryProvider,
+} from "$shared/server-context";
+import { getDataMapFromPipeStream, streamToResponse } from "$shared/stream";
+import { PassThrough } from "node:stream";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Hono } from "hono";
+import { compress } from "hono/compress";
+import { lazy } from "react";
+import { renderToPipeableStream } from "react-dom/server";
+import { StaticRouter } from "react-router";
+import api from "./api";
+⋮----
+const componentFn = (sc: ServerContextI) => (
+      <ServerQueryProvider value={sc}>
+        <StaticRouter location={c.req.path}>
+          <Root />
+        </StaticRouter>
+      </ServerQueryProvider>
+    );
+⋮----
+onShellError(err)
+⋮----
+onError(err)
+</file>
+
+<file path="rspack.config.ts">
+import path from "node:path";
+import { defineConfig } from "@rspack/cli";
+import { rspack } from "@rspack/core";
+import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
+import { RunScriptWebpackPlugin } from "run-script-webpack-plugin";
+import WebpackObfuscator from "webpack-obfuscator";
+⋮----
+const clientConfig = (mode: "development" | "production")
+const serverConfig = (mode: "development" | "production")
+</file>
+
+<file path="README.md">
+# ⚛️ R2H Boilerplate
+
+![Node Version](https://img.shields.io/badge/node-22%2B-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
+![Rspack](https://img.shields.io/badge/Bundler-Rspack-red)
+![React 19](https://img.shields.io/badge/React-19.1.0-61dafb)
+
+> A blazing-fast SSR starter powered by **React 19**, **Rspack**, and **Hono** — engineered for modern development with cutting-edge performance, beautiful UI components, and secure production builds.
+
+---
+
+## 💡 Motivation
+
+I built this boilerplate out of a growing need to break free from the limitations imposed by popular frameworks like Next.js and Remix.
+
+While those frameworks offer great DX, their performance often relies heavily on specific deployment architectures (like Vercel for Next.js). This can result in unnecessary complexity, vendor lock-in, and suboptimal flexibility for developers who want full control over their stack.
+
+This boilerplate is my answer to that problem — a lean, fast, and unopinionated SSR setup using:
+
+✅ React with full flexibility,
+
+✅ Rspack for blazing fast builds,
+
+✅ Hono for a lightweight and modern web server,
+
+✅ Manual control over server-side data fetching, hydration, and routing.
+
+No limits. No lock-in. Just raw power and freedom.
+
+---
+
+## 🚀 Tech Stack
+
+| Tool                       | Purpose                                                           |
+| -------------------------- | ----------------------------------------------------------------- |
+| **React 19**               | UI Library (Concurrent Features Ready)                            |
+| **Rspack**                 | Ultra-fast Rust-based bundler                                     |
+| **Hono**                   | Lightning-fast web framework for Node                             |
+| **React Router**           | Seamless routing with SSR compatibility                           |
+| **shadcn/ui + Radix UI**   | Accessible, customizable UI components                            |
+| **TailwindCSS 4**          | Utility-first styling with animation                              |
+| **JavaScript Obfuscator**  | Protect source code in production builds                          |
+| **dotenv**                 | Manage environment variables                                      |
+| **TypeScript (strict)**    | Type-safe code for frontend and backend                           |
+| **Better-auth**            | Simple extensibility for OAuth, magic links, or custom strategies |
+| **Drizzle ORM**            | Type-safe database access with powerful query capabilities        |
+
+---
+
+## 🌐 Features
+
+- ✅ **Server-Side Rendering (SSR)** with `hono` and `react-dom/server`
+- ⚡ **Rspack HMR & Build Speed** like Vite but for complex apps
+- 🧠 **Custom `useServerQuery` Hook** for pre-hydration data fetching
+- 🔄 **React Router v7 SSR-Ready Routing**
+- 💅 **shadcn Components + Tailwind Merge + AnimateCSS**
+- 🛡️ **Obfuscated JavaScript** in production using `webpack-obfuscator`
+- 🧪 **Full TypeScript Support** with strict mode enabled
+- 📦 **Hono OpenAPI** for API documentation and testing
+
+---
+
+## 🔐 Authentication Made Easy
+
+With **better-auth** and **Drizzle ORM**, this boilerplate supports:
+
+- JWT-based sessions
+- Authenticated route protection
+- Secure cookie/token management
+- Simple extensibility for OAuth, magic links, or custom strategies
+- **Drizzle ORM** as the database adapter (PostgreSQL)
+
+### Environment Variables
+
+Add the following to your `.env`:
+
+```
+BETTER_AUTH_SECRET=your-random-secret
+BETTER_AUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID= # (optional, for Google login)
+GOOGLE_CLIENT_SECRET= # (optional, for Google login)
+```
+
+### API Endpoints
+
+- All authentication endpoints are available at `/api/auth/*`.
+- Protect server routes using Better Auth's session check:
+  ```ts
+  import { auth } from "$server/lib/auth";
+  // In a Hono route handler:
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) return c.text("Unauthorized", 401);
+  ```
+
+---
+
+## 📁 Project Structure
+
+```
+├── server/
+│   ├── api.ts
+│   ├── routes/
+│   ├── lib/
+│   ├── hono.tsx
+│   └── ...
+├── shared/
+│   ├── components/
+│   ├── utils/
+│   └── ...
+├── public/
+│   ├── ...
+│   └── ...
+├── .env
+│   └── ...
+├── ...
+```
+</file>
+
+<file path="package.json">
+{
+  "name": "r2h",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "rspack build --mode development -w",
+    "build": "rspack build --mode production",
+    "start": "node _module/server.js",
+    "lint": "biome lint --write",
+    "format": "biome format --write"
+  },
+  "dependencies": {
+    "@hono/arktype-validator": "^2.0.1",
+    "@hono/node-server": "^1.14.1",
+    "@radix-ui/react-accordion": "^1.2.10",
+    "@radix-ui/react-dialog": "^1.1.13",
+    "@radix-ui/react-slot": "^1.2.2",
+    "@scalar/hono-api-reference": "^0.9.7",
+    "arktype": "^2.1.20",
+    "axios": "^1.9.0",
+    "better-auth": "^1.2.10",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.44.2",
+    "hono": "^4.7.9",
+    "hono-openapi": "^0.4.8",
+    "lucide-react": "^0.510.0",
+    "pg": "^8.16.2",
+    "prettier": "^3.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.6.0",
+    "tailwind-merge": "^3.3.0",
+    "tw-animate-css": "^1.2.9",
+    "validation-better-auth": "^1.3.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6",
+    "@rspack/cli": "^1.3.10",
+    "@rspack/core": "^1.3.10",
+    "@rspack/dev-server": "^1.1.1",
+    "@rspack/plugin-react-refresh": "^1.4.3",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@types/dotenv-webpack": "^7.0.8",
+    "@types/node": "^22.15.17",
+    "@types/pg": "^8.15.4",
+    "@types/react": "^19.1.3",
+    "@types/react-dom": "^19.1.3",
+    "dotenv-webpack": "^8.1.0",
+    "drizzle-kit": "^0.31.2",
+    "javascript-obfuscator": "^4.1.1",
+    "postcss": "^8.5.3",
+    "postcss-loader": "^8.1.1",
+    "react-refresh": "^0.17.0",
+    "run-script-webpack-plugin": "^0.2.3",
+    "tailwindcss": "^4.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "webpack-obfuscator": "^3.5.1"
+  },
+  "trustedDependencies": [
+    "@tailwindcss/oxide",
+    "esbuild",
+    "javascript-obfuscator"
+  ]
+}
+</file>
+
+</files>

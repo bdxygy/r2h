@@ -1,21 +1,40 @@
+import { auth } from "$server/lib/auth";
 import { Hono } from "hono";
-import {
-    setSignedCookie,
-} from 'hono/cookie'
+import { cors } from "hono/cors";
 
-export const authRoutes = new Hono({
-    strict: false
+const authRoutes = new Hono<{
+  Variables: {
+    user: typeof auth.$Infer.Session.user | null;
+    session: typeof auth.$Infer.Session.session | null;
+  };
+}>();
+
+authRoutes.use("*", async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+  if (!session) {
+    c.set("user", null);
+    c.set("session", null);
+    return next();
+  }
+
+  c.set("user", session.user);
+  c.set("session", session.session);
+  return next();
 });
 
-authRoutes.get("/", async (c) => {
+authRoutes.on(["GET", "POST"], "/auth/*", async (c) => auth.handler(c.req.raw));
 
-    await setSignedCookie(c, "foo", "bar", Buffer.from("secret", "utf-8"), {
-        httpOnly: true
-    });
+authRoutes.use(
+  "/auth/**",
+  cors({
+    origin: "http://localhost:32300", // replace with your origin
+    allowHeaders: ["Content-Type", "Authorization", "Cookie", "Set-Cookie"],
+    allowMethods: ["POST", "GET", "OPTIONS"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
 
-    return c.html("Please Check the Cookies");
-});
-
-authRoutes.get("/check", async (c) => {
-    return c.json({ status: true });
-})
+export default authRoutes;

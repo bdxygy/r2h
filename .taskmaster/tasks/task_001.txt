@@ -1,0 +1,48 @@
+# Task ID: 1
+# Title: Integrate Drizzle ORM, Better-Auth, and PostgreSQL with Docker Compose
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Set up Drizzle ORM for PostgreSQL, integrate Better-Auth using Drizzle as its adapter, protect authentication routes, and provide a docker-compose setup for PostgreSQL. Update environment variables and documentation to reflect these changes.
+# Details:
+1. Add Drizzle ORM and node-postgres to the project dependencies. 2. Create a docker-compose.yml file to provision a PostgreSQL service, exposing necessary ports and setting environment variables for user, password, and database. 3. Configure Drizzle ORM for PostgreSQL: create a drizzle.config.ts specifying the schema location, output directory for migrations, and PostgreSQL dialect. 4. Set up a .env file with the DATABASE_URL matching the docker-compose configuration. 5. Initialize Drizzle ORM connection in the codebase, following best practices for connection pooling and error handling. 6. Integrate Better-Auth, configuring it to use Drizzle as its adapter for session and user management. 7. Implement middleware to protect authentication routes, ensuring only authenticated users can access protected endpoints. 8. Update project documentation to include setup instructions for Docker, environment variables, and authentication flow. 9. Ensure all code follows project conventions and best practices for security and maintainability.
+
+# Test Strategy:
+- Start the PostgreSQL service using docker-compose and verify connectivity from the application.
+- Run Drizzle ORM migrations to ensure schema is correctly applied to the database.
+- Register and log in a user via Better-Auth, confirming that user data is stored in PostgreSQL through Drizzle.
+- Attempt to access protected routes without authentication and verify access is denied; confirm access is granted after authentication.
+- Check that environment variables are loaded correctly and referenced in both Drizzle and Better-Auth configurations.
+- Review documentation for completeness and accuracy by following setup steps from scratch.
+
+# Subtasks:
+## 1. Provision PostgreSQL with Docker Compose and Configure Environment [pending]
+### Dependencies: None
+### Description: Create a docker-compose.yml file to provision a PostgreSQL service, exposing necessary ports and setting environment variables for user, password, and database. Set up a .env file with the DATABASE_URL and related variables matching the Docker configuration.
+### Details:
+Define a docker-compose.yml with a postgres service, specifying image, ports, and environment variables (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB). Create a .env file in the project root with DATABASE_URL and other relevant variables. Ensure the database credentials in .env match those in docker-compose.yml.
+
+## 2. Install Dependencies and Configure Drizzle ORM [pending]
+### Dependencies: None
+### Description: Add Drizzle ORM and node-postgres to the project dependencies. Create drizzle.config.ts specifying schema location, output directory for migrations, and PostgreSQL dialect. Initialize Drizzle ORM connection in the codebase using connection pooling and error handling best practices.
+### Details:
+Install drizzle-orm and pg packages. Create drizzle.config.ts with schema and migration settings. In src/db or similar, set up a Pool from pg using environment variables, and initialize Drizzle with the pool and schema imports. Follow Drizzle documentation for best practices on connection pooling and error handling.
+
+## 3. Integrate Better-Auth with Drizzle Adapter [pending]
+### Dependencies: None
+### Description: Install and configure Better-Auth, setting it up to use Drizzle as its adapter for session and user management.
+### Details:
+Install Better-Auth and its Drizzle adapter. Configure Better-Auth in the authentication module to use Drizzle for storing and retrieving user/session data. Ensure the adapter is initialized with the Drizzle instance and schema.
+
+## 4. Implement Middleware to Protect Authentication Routes [pending]
+### Dependencies: None
+### Description: Develop middleware to ensure only authenticated users can access protected endpoints, leveraging Better-Auth session management.
+### Details:
+Create middleware that checks for a valid session or authentication token using Better-Auth. Apply this middleware to routes requiring authentication. Ensure proper error handling and redirection for unauthenticated requests.
+
+## 5. Update Documentation and Environment Variables [pending]
+### Dependencies: None
+### Description: Revise project documentation to include setup instructions for Docker, environment variables, Drizzle ORM, and authentication flow. Ensure all environment variables are documented and up to date.
+### Details:
+Update README.md or equivalent with detailed setup steps for Docker Compose, Drizzle ORM, and Better-Auth integration. List and explain all required environment variables. Document the authentication flow and protected route usage.
+

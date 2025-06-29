@@ -8,6 +8,6 @@ import("./hono").then(({ default: m }) => {
     },
     (info) => {
       console.log(`Listening on http://localhost:${info.port}`);
-    }
+    },
   );
 });

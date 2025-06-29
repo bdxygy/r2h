@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: r2huser
+      POSTGRES_PASSWORD: r2hpass
+      POSTGRES_DB: r2hdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

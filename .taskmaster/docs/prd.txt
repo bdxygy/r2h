@@ -1,0 +1,46 @@
+# PRD: Integrate Drizzle ORM, Better-Auth, and Postgres
+
+## Overview
+Integrate Drizzle ORM for PostgreSQL, Better-Auth for authentication, and set up a Postgres database using docker-compose in the R2H boilerplate. Ensure all authentication uses Better-Auth with Drizzle as the adapter, and that the database is accessible via Drizzle ORM. Provide a docker-compose setup for local development, update environment variables, and document the integration.
+
+## Goals
+- Use Drizzle ORM for all database operations (PostgreSQL)
+- Use Better-Auth for authentication, with Drizzle as the adapter
+- Set up Postgres using docker-compose for local development
+- Protect API routes using Better-Auth
+- Update environment variables and documentation
+
+## Requirements
+1. **Database**
+   - Use PostgreSQL as the database
+   - Provide a docker-compose.yml for local Postgres
+   - Add Drizzle ORM configuration for PostgreSQL
+   - Create basic user/session/account tables for auth
+2. **Authentication**
+   - Integrate Better-Auth with Drizzle ORM (DrizzleAdapter)
+   - Implement Email/Password and Google OAuth strategies
+   - Protect routes using auth.protect()
+   - Add login/logout endpoints using auth.handle
+3. **Environment**
+   - Add required environment variables (.env.example)
+   - Document all new variables and setup steps
+4. **Documentation**
+   - Update README with integration/setup instructions
+   - Document how to run docker-compose and migrate the database
+
+## Constraints
+- Follow project conventions and code structure
+- Use TypeScript strict mode
+- Use absolute imports
+- No hardcoded secrets
+- All code must be modular and testable
+
+## Out of Scope
+- UI for login/signup (API only)
+- Advanced auth features (2FA, SSO, etc.)
+
+## Acceptance Criteria
+- All code builds and runs locally
+- Auth endpoints work with Postgres via Drizzle ORM
+- docker-compose brings up a working Postgres instance
+- Documentation is clear and complete 

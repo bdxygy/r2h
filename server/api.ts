@@ -1,24 +1,55 @@
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { authRoutes } from "./routes/auth";
-import { getSignedCookie } from "hono/cookie";
+import { describeRoute, openAPISpecs } from "hono-openapi";
+import authRoutes from "./routes/auth";
 
-const api = new Hono({
-    strict: true
-});
+const api = new Hono();
 
-api.get("/", async (c) => {
-    const cookie = c.req.header("cookie");
+api.get(
+  "/",
+  describeRoute({
+    description: "Hello world",
+    tags: ["hello"],
+    responses: {
+      200: {
+        description: "Successful response",
+      },
+    },
+    validateResponse: true,
+  }),
+  (c) => {
+    return c.json({ name: "Hello world" }, 200);
+  },
+);
 
-    console.log({ cookie })
+api.get(
+  "/openapi",
+  openAPISpecs(api, {
+    documentation: {
+      info: {
+        title: "Hono",
+        version: "1.0.0",
+        description: "API for greeting users",
+      },
+      servers: [
+        {
+          url: "http://localhost:32300/api",
+          description: "Local server",
+        },
+      ],
+    },
+  }),
+);
 
-    const foo = await getSignedCookie(c, Buffer.from("secret", "utf-8"), "foo");
+api.get(
+  "/docs",
+  Scalar({
+    theme: "solarized",
+    url: "/api/openapi",
+    baseServerURL: "http://localhost:32300/api/",
+  }),
+);
 
-    if (foo) return c.text(`Hello ${foo}`)
+api.route("/", authRoutes);
 
-    return c.text("Hello world!")
-});
-
-api.route("auth", authRoutes)
-
-
-export default api
+export default api;
